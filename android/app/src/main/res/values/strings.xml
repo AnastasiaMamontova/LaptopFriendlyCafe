@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Cafe Berlin</string>
+    <string name="title_activity_main">Cafe Berlin</string>
+    <string name="package_name">app.cafeberlin.mobile</string>
+    <string name="custom_url_scheme">app.cafeberlin.mobile</string>
+</resources>
