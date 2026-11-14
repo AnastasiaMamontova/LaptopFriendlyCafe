@@ -4,6 +4,8 @@ import type { Cafe, CafeInput } from '../types/cafe'
 import { saveCafe, uploadPhoto, deletePhoto } from '../lib/cafes'
 import { Button } from './ui/button'
 import { Modal } from './ui/dialog'
+import OpeningHoursEditor from './OpeningHoursEditor'
+import { openingHoursError } from '../lib/opening-hours'
 
 const districts = ['Mitte','Prenzlauer Berg','Kreuzberg','Friedrichshain','Neukölln','Charlottenburg','Schöneberg','Wedding','Moabit','Tiergarten','Wilmersdorf','Steglitz','Tempelhof','Treptow','Lichtenberg','Pankow','Reinickendorf','Spandau','Köpenick','Marzahn','Hellersdorf','Zehlendorf','Other district']
 const initial: CafeInput = { name: '', district: '', address: '', description: '', lat: 52.52, lng: 13.405, rating: 4, wifi: false, sockets: false, noise: 'moderate', laptop_friendly: true, hours: '', website: '', photos: [] }
@@ -47,6 +49,8 @@ export default function CafeEditor({ cafe, onClose, onSaved }: { cafe?: Cafe; on
     if (!locationConfirmed) { setError('Find the address on the map or enter coordinates manually.'); return }
     if (!Number.isFinite(form.lat) || !Number.isFinite(form.lng) || form.lat < -90 || form.lat > 90 || form.lng < -180 || form.lng > 180) { setError('Check the coordinates.'); return }
     if (form.website && !/^https?:\/\//i.test(form.website)) { setError('Website URLs must start with https:// or http://'); return }
+    const hoursError = openingHoursError(form.hours)
+    if (hoursError) { setError(hoursError); return }
     setSaving(true)
     const uploaded: string[] = []
     try {
@@ -73,7 +77,7 @@ export default function CafeEditor({ cafe, onClose, onSaved }: { cafe?: Cafe; on
       <div className="rating-editor"><label htmlFor="cafe-rating">Your rating</label><output htmlFor="cafe-rating">★ {form.rating.toFixed(1)}</output><input id="cafe-rating" aria-label="Your rating" type="range" min="1" max="5" step="0.1" value={form.rating} onChange={e => update('rating', Number(e.target.value))} /><div><span>1 — not for me</span><span>5 — a favorite</span></div></div>
       <div className="field"><label>Work essentials</label><div className="check-grid">{([['wifi','Wi-Fi'],['sockets','Outlets'],['laptop_friendly','Laptops welcome']] as const).map(([key,label]) => <label className="checkbox-option" key={key}><input type="checkbox" checked={form[key]} onChange={e => update(key, e.target.checked)} />{label}</label>)}</div></div>
       <div className="field"><label htmlFor="cafe-noise">Noise level</label><select id="cafe-noise" value={form.noise} onChange={e => update('noise', e.target.value as CafeInput['noise'])}><option value="quiet">Quiet — easy to focus</option><option value="moderate">Moderate noise</option><option value="lively">Lively</option></select></div>
-      <div className="field"><label htmlFor="cafe-hours">Opening hours</label><input id="cafe-hours" maxLength={300} placeholder="Mon–Fri 09:00–18:00, Sat–Sun 10:00–17:00" value={form.hours} onChange={e => update('hours', e.target.value)} /></div>
+      <OpeningHoursEditor value={form.hours} onChange={value => update('hours', value)} />
       <div className="field"><label htmlFor="cafe-website">Website</label><input id="cafe-website" type="url" maxLength={500} placeholder="https://" value={form.website} onChange={e => update('website', e.target.value)} /></div>
       </fieldset>
       {error && <p className="form-error" role="alert">{error}</p>}

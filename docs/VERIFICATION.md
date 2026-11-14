@@ -1,4 +1,22 @@
-# UI refresh verification — 2026-11-14
+# Opening-hours editor verification — 2026-11-14
+
+- TypeScript and the production Vite/PWA build pass.
+- Playwright: **40/40 passing** across mobile and desktop projects, including all
+  18 catalog checks and 22 new schedule checks (parser/validation and browser
+  scenarios run in both projects).
+- Verified creation from selectors, standardized storage, reload and re-edit,
+  day copying, breaks, 24-hour operation and overnight closing.
+- Overlapping periods, equal times and overlaps across Sunday–Monday are rejected.
+- Unrecognized legacy text survives unrelated edits and requires explicit
+  replacement; restoring the original before saving is covered.
+- Tests intercept the API. No live records, photos or policies were changed.
+- Layout checked at 320, 390, 768 and 1440 px with no horizontal overflow.
+- No schema migration was needed. No APK was built and no deployment was made.
+
+Design rationale and external references: [OPENING_HOURS.md](OPENING_HOURS.md).
+Editor screenshot: [opening-hours-mobile.png](screenshots/opening-hours-mobile.png).
+
+## UI refresh verification — 2026-11-14
 
 - English interface refreshed with warm ivory, lavender and coral colors,
   local vector illustrations, cafe cards, map previews and updated dialogs.

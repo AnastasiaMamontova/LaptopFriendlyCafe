@@ -209,6 +209,42 @@ input[type=checkbox] { width: 19px; height: 19px; accent-color: #a067b9; flex-sh
 .filter-options>label>span { flex: 1; font-size: 13px; font-weight: 700; color: var(--ink); }
 .filter-options small { display: block; font-size: 11px; font-weight: 400; margin-top: 4px; color: var(--muted); }
 .filter-form .form-actions { margin: 0; border: 0; padding: 0; justify-content: space-between; }
+.hours-editor { min-width: 0; margin: 0; padding: 0; border: 0; }
+.hours-editor legend { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 800; padding: 0; margin-bottom: 9px; }
+.hours-hint { color: var(--muted); font-size: 12px; line-height: 1.7; }
+.hours-copy { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 13px 0; font-size: 11px; }
+.hours-copy>span { display: flex; align-items: center; gap: 5px; color: var(--muted); }
+.hours-copy button { min-height: 36px; padding: 7px 11px; border-radius: 9px; background: var(--lavender); font-weight: 700; }
+.hours-days { border: 1px solid #e5d7e9; border-radius: 14px; overflow: hidden; }
+.hours-day { padding: 13px; background: var(--surface); }
+.hours-day+.hours-day { border-top: 1px solid var(--line); }
+.hours-day-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.hours-day-heading>span { font-size: 13px; font-weight: 800; }
+.hours-day select, .hours-time-picker select { background: #fffaf7; color: var(--ink); border: 1px solid #dfd1e6; border-radius: 8px; min-height: 40px; padding: 7px 9px; font-size: 13px; }
+.hours-day-heading>select { max-width: 155px; width: 155px; }
+.hours-periods { margin-top: 11px; }
+.hours-period+.hours-period { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.hours-time-fields { display: flex; align-items: flex-end; gap: 10px; }
+.hours-time-field { min-width: 0; flex: 1; }
+.hours-time-field>span { display: block; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+.hours-time-picker { display: flex; align-items: center; gap: 4px; }
+.hours-time-picker select { min-width: 0; flex: 1; width: 57px; padding-inline: 6px; }
+.hours-separator { line-height: 40px; color: var(--muted); }
+.hours-remove { display: grid; place-items: center; width: 32px; height: 40px; background: var(--lavender); border-radius: 8px; flex-shrink: 0; }
+.hours-add { display: flex; align-items: center; gap: 5px; background: transparent; min-height: 36px; font-size: 11px; color: #705080; margin-top: 6px; padding: 4px 0; }
+.hours-overnight { font-size: 11px; color: #705080; margin-top: 5px; }
+.hours-error { padding: 11px; margin-top: 12px; border-radius: 10px; background: #ffe8e6; color: #a52e45; font-size: 12px; line-height: 1.7; }
+.hours-restore { font-size: 11px; text-decoration: underline; text-underline-offset: 3px; background: transparent; min-height: 36px; margin-top: 10px; color: #705080; }
+.hours-legacy { background: #f5ebf8; border-radius: 13px; padding: 14px; margin-top: 12px; }
+.hours-legacy>p { font-size: 12px; color: var(--muted); line-height: 1.7; }
+.hours-legacy blockquote { margin: 10px 0; white-space: pre-line; font-size: 13px; overflow-wrap: anywhere; }
+.hours-legacy .button { margin-top: 12px; }
+.detail-facts>div>div { min-width: 0; flex: 1; }
+.opening-hours-list { display: grid; gap: 9px; margin: 12px 0 0; color: var(--ink); font-size: 12px; }
+.opening-hours-list>div { display: grid; grid-template-columns: 90px 1fr; gap: 14px; }
+.opening-hours-list dt { font-weight: 700; }
+.opening-hours-list dd { margin: 0; text-align: right; white-space: pre-line; }
+.opening-hours-list .hours-unspecified { color: var(--muted); }
 .detail-modal { max-width: 650px; display: flex; flex-direction: column; }
 .detail-modal>* { flex-shrink: 0; }
 .detail-modal .modal-heading { order: 2; position: static; border: 0; padding-top: 25px; padding-bottom: 16px; }
@@ -355,6 +391,13 @@ input[type=checkbox] { width: 19px; height: 19px; accent-color: #a067b9; flex-sh
   .editor-form, .filter-form { padding: 22px 21px; }
   .field input:not([type=checkbox]):not([type=range]), .field textarea, .field select { font-size: 16px; }
   .field>label small { font-size: 10px; margin-left: 4px; }
+  .hours-day { padding: 11px; }
+  .hours-day select { font-size: 16px; min-height: 44px; }
+  .hours-day-heading>select { width: 155px; }
+  .hours-time-fields { gap: 6px; }
+  .hours-time-picker { gap: 2px; }
+  .hours-time-picker select { padding-inline: 3px; }
+  .hours-remove { width: 28px; height: 44px; }
   .form-actions { position: sticky; bottom: -22px; padding: 17px 0 20px; background: #fffaf7; z-index: 2; }
   .form-actions>.button { flex: 1; font-size: 12px; }
   .filter-form .form-actions { position: static; }

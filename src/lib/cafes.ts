@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import type { Cafe, CafeInput } from '../types/cafe'
+import { openingHoursError } from './opening-hours'
 
 const BUCKET = 'cafe-photos'
 const MAX_PHOTO_SIZE = 10 * 1024 * 1024
@@ -32,6 +33,8 @@ function validate(input: CafeInput): CafeInput {
       if (!['http:', 'https:'].includes(website.protocol)) throw new Error()
     } catch { throw new Error('Enter a website URL starting with https://.') }
   }
+  const hoursError = openingHoursError(input.hours)
+  if (hoursError) throw new Error(hoursError)
   return {
     ...input,
     name: input.name.trim(), address: input.address.trim(), district: input.district.trim(),

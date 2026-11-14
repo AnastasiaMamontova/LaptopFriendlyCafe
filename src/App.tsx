@@ -9,6 +9,7 @@ import { emptyFilters, filterCafes, formatRating, noiseLabels, type Filters } fr
 import { Button } from './components/ui/button'
 import { Modal } from './components/ui/dialog'
 import CafeEditor from './components/CafeEditor'
+import OpeningHours from './components/OpeningHours'
 import { BerlinSkyline, CatMark, WorkIllustration } from './components/BrandArt'
 const CafeMap = lazy(() => import('./components/CafeMap'))
 const CACHE_KEY = 'cafe-berlin-catalog-v1'
@@ -44,7 +45,7 @@ function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; de
     <div className="detail-hero">{photo === 0 ? <Photo cafe={cafe} /> : <img src={cafe.photos[photo]} alt={`Photo ${cafe.name}, ${photo+1}`} />}<span className="rating-badge"><Star size={14} fill="currentColor" />{formatRating(cafe.rating)} <small>your rating</small></span><span className="detail-mascot"><CatMark /></span></div>
     {cafe.photos.length > 1 && <div className="gallery-thumbs">{cafe.photos.map((url,i) => <button key={url} onClick={() => setPhoto(i)} aria-label={`Show photo ${i+1}`} aria-pressed={photo === i}><img src={url} alt="" /></button>)}</div>}
     <div className="detail-body">{demo && <div className="demo-notice"><Sparkles size={16} /> Sample card. Names and details are illustrative.</div>}<Features cafe={cafe} /><p className="detail-description">{cafe.description || 'No description yet.'}</p>
-      <div className="detail-facts"><div><MapPin size={20} /><div><small>Address</small><p>{cafe.address}</p></div></div><div><Clock3 size={20} /><div><small>Opening hours</small><p>{cafe.hours || 'Not added yet'}</p></div></div><div><Headphones size={20} /><div><small>Atmosphere</small><p>{noiseLabels[cafe.noise]}</p></div></div></div>
+      <div className="detail-facts"><div><MapPin size={20} /><div><small>Address</small><p>{cafe.address}</p></div></div><div><Clock3 size={20} /><div><small>Opening hours</small><OpeningHours value={cafe.hours} /></div></div><div><Headphones size={20} /><div><small>Atmosphere</small><p>{noiseLabels[cafe.noise]}</p></div></div></div>
       <div className="detail-amenities"><h3>Work essentials</h3>{[[cafe.wifi,'Wi-Fi'],[cafe.sockets,'Outlets'],[cafe.laptop_friendly,'Laptops welcome']].map(([yes,label]) => <p key={String(label)}><span>{label}</span><span className={yes ? 'available' : 'unavailable'}>{yes ? <><Check size={16} /> Available</> : 'No / not confirmed'}</span></p>)}</div>
       {!demo && <div className="detail-links"><Button asChild><a href={mapUrl} target="_blank" rel="noreferrer"><MapPin size={17} />Get directions<ArrowUpRight size={15} /></a></Button>{/^https?:\/\//i.test(cafe.website) && <Button variant="outline" asChild><a href={cafe.website} target="_blank" rel="noreferrer">Cafe website<ExternalLink size={15} /></a></Button>}</div>}
       {!demo && <div className="detail-edit"><Button variant="ghost" onClick={onEdit}><Pencil size={16} />Edit</Button><Button variant="ghost" className="text-danger" onClick={onDelete}><Trash2 size={16} />Delete</Button></div>}
