@@ -1,4 +1,23 @@
-# Weekday hours editor verification
+# Catalog heading, filters and footer verification
+
+- The list heading is now “Laptop-friendly cafés”. The cafe count stays with
+  the last word when the heading wraps on mobile.
+- Removed the laptop quick filter, its checkbox in the filter dialog, and its
+  filtering condition. Catalog cards and map previews no longer repeat laptop
+  badges. Existing cafe records and their stored fields remain unchanged.
+- Removed the footer install button and its help dialog/prompt flow. No install
+  control was relocated. Offline collection browsing and PWA updates remain.
+- The three remaining quick filters share one row on mobile.
+- All 20 catalog Playwright tests passed on mobile and desktop, covering search,
+  remaining filters, map, detail view, CRUD/photos, offline cache and English UI.
+  TypeScript and the production Vite/PWA build passed.
+- Production screenshots use illustrative fixture data and local photos:
+  [top](screenshots/catalog-top-mobile.png) and
+  [bottom](screenshots/catalog-bottom-mobile.png). Widths of 320, 390 and 1440 px
+  were checked without horizontal overflow or browser runtime errors.
+- No APK was built. The existing versioned Android 1.0.4 APK remains unchanged.
+
+## Weekday hours editor verification
 
 - Replaced seven day rows, status selectors, copy controls and additional periods
   with a fixed Weekdays / Monday–Friday card and four hour/minute selectors.

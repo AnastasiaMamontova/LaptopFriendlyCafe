@@ -2,7 +2,7 @@
 
 A mobile-first collection of laptop-friendly cafes in Berlin: list and map views,
 search by name, district or address, filters for Wi-Fi, outlets, quiet spaces,
-laptop use, district and rating, photos, and personal ratings from 1 to 5 in 0.1
+district and rating, photos, and personal ratings from 1 to 5 in 0.1
 increments. Add and edit cafes directly from your phone.
 
 The app has no sign-in or roles. Browsing, adding, editing and deleting are open
