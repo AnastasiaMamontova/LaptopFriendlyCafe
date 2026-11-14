@@ -31,7 +31,7 @@ export default function OpeningHoursEditor({ value, onChange, onErrorChange }: {
   }
   return <fieldset className="hours-editor" aria-describedby="hours-hint">
     <legend><Clock3 size={20} />Opening hours</legend>
-    <p id="hours-hint" className="hours-hint">One time range for all weekdays. Berlin time · 24-hour clock.</p>
+    <p id="hours-hint" className="hours-hint">Berlin time</p>
     <div className="hours-weekday-card">
       <div className="hours-weekday-heading"><div><strong>Weekdays</strong><span>Monday–Friday</span></div><CalendarDays size={28} aria-hidden="true" /></div>
       <div className="hours-time-fields">
