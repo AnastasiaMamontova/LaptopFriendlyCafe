@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Cafe Berlin',
   webDir: 'dist',
   android: {
-    backgroundColor: '#f8f6f0',
+    backgroundColor: '#fffaf7',
     adjustMarginsForEdgeToEdge: 'auto',
   },
 };

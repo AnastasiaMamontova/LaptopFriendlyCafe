@@ -14,7 +14,7 @@ for (const [density, scale] of Object.entries({ mdpi: 1, hdpi: 1.5, xhdpi: 2, xx
   await writeFile(resolve(folder, 'ic_launcher_round.png'), icon);
   const canvas = Math.round(108 * scale);
   const glyph = Math.round(64 * scale);
-  await sharp({ create: { width: canvas, height: canvas, channels: 4, background: '#183d33' } })
+  await sharp({ create: { width: canvas, height: canvas, channels: 4, background: '#e7d4f1' } })
     .composite([{ input: await sharp(source).resize(glyph, glyph).png().toBuffer(), gravity: 'center' }])
     .png().toFile(resolve(folder, 'ic_launcher_foreground.png'));
 }
@@ -25,7 +25,7 @@ for (const folder of await readdir(res)) {
   try {
     const { width, height } = await sharp(file).metadata();
     const size = Math.round(Math.min(width, height) * 0.25);
-    const output = await sharp({ create: { width, height, channels: 4, background: '#f8f6f0' } })
+    const output = await sharp({ create: { width, height, channels: 4, background: '#fffaf7' } })
       .composite([{ input: await sharp(source).resize(size, size).png().toBuffer(), gravity: 'center' }])
       .png().toBuffer();
     await writeFile(file, output);

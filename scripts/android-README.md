@@ -15,10 +15,15 @@ npm run android:build
 
 The result is `downloads/cafe-berlin-debug.apk` (also copied to `artifacts/`).
 Generated APKs and checksums are local build outputs and are excluded from Git.
+The current verified build is **1.0.2** (versionCode **3**); see
+[release verification](../docs/ANDROID_RELEASE_1.0.2.md).
 It is signed with the local
 development key, so it can be installed directly on a phone after allowing APK
 installation from your download source. Keep the development key if you want
 future builds to update that installation without uninstalling it first.
+Set `ANDROID_USER_HOME` to the directory containing your existing
+`debug.keystore` when using a prepared build environment. Verify the signing
+certificate matches the installed version before distributing an update.
 
 With Android platform-tools installed and USB debugging enabled:
 

@@ -1,4 +1,13 @@
-# Berlin address search verification — 2026-11-14
+# Android 1.0.2 verification — 2026-11-14
+
+All current feature commits were confirmed on GitHub before building.
+The 54-test suite, production web build, Android build and Android lint pass.
+The new APK uses versionCode 3 and the same signing certificate as 1.0.1;
+its 23 bundled web files match the final production build exactly.
+See [the release verification](ANDROID_RELEASE_1.0.2.md) for checksums and details.
+The APK stays outside Git. Physical-device testing has not been performed.
+
+## Berlin address search verification — 2026-11-14
 
 - TypeScript and production Vite/PWA build pass.
 - Playwright: **54/54 passing**, including all 40 existing checks and 14 new
