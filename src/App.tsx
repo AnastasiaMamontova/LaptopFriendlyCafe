@@ -113,7 +113,7 @@ export default function App() {
     <div className="main-shell"><header className="topbar">
       <a className="brand" href="/" aria-label="Café Berlin — home"><span className="brand-icon"><CatMark /></span><span>Berlin<small>Laptop Cafés</small></span></a>
       <nav className="desktop-nav" aria-label="Main navigation"><button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}><Grid2X2 size={17} />Discover</button><button className={view === 'map' ? 'active' : ''} onClick={() => setView('map')}><Map size={17} />Berlin map</button></nav>
-      <div className="topbar-actions"><button className="install-button" onClick={installApp} aria-label="Install app"><Download size={18} /><span>Get the app</span></button><Button aria-label="Add cafe" onClick={newCafe} disabled={offline}><Plus size={18} /><span>Add cafe</span></Button></div>
+      <div className="topbar-actions"><button className="install-button" onClick={installApp} aria-label="Install app"><Download size={18} /><span>Get the app</span></button><Button className="header-add-cafe" aria-label="Add cafe" onClick={newCafe} disabled={offline}><Plus size={18} /><span>Add cafe</span></Button></div>
     </header>
       <main>
         <section className={`hero${view === 'map' ? ' hero-compact' : ''}`}>

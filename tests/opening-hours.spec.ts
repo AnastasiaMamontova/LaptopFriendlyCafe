@@ -79,7 +79,7 @@ async function time(page: Page, label: string, value: string) {
 test('creates uniform weekly hours using only lists, then reloads and edits them', async ({ page }) => {
   const writes = await backend(page)
   await page.goto('/')
-  await page.locator('.topbar .button').click()
+  await page.getByRole('button', { name: 'Add cafe', exact: true }).click()
   await page.getByLabel('Name', { exact: false }).fill('Weekly Cafe')
   await page.getByLabel('District', { exact: false }).fill('Mitte')
   await page.getByLabel('Address', { exact: false }).fill('Teststraße 2')

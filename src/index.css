@@ -326,6 +326,7 @@ input[type=checkbox] { width: 19px; height: 19px; accent-color: #a067b9; flex-sh
 }
 @media (max-width: 800px) {
   .desktop-nav { display: none; }
+  .header-add-cafe { display: none; }
   .topbar { min-height: 90px; padding: 18px 25px; }
   main { padding: 0 25px 100px; }
   .hero { min-height: 370px; padding: 30px 0; grid-template-columns: 1.1fr 1fr; }
