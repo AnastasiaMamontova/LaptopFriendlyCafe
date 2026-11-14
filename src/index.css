@@ -91,6 +91,7 @@ main { padding: 0 52px 20px; }
 .filters-button b { background: #e9d7f1; border-radius: 50%; min-width: 21px; font-size: 11px; padding: 3px; }
 .filters-button.has-filters { background: var(--lavender); border-color: #bca0cd; }
 .filter-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin: 16px 0 26px; }
+.filter-row>.filters-button { margin-left: auto; }
 .quick-filters { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { background: #f0e6f5; border: 1px solid transparent; border-radius: 11px; padding: 9px 13px; min-height: 39px; display: inline-flex; gap: 6px; align-items: center; font-weight: 700; font-size: 11px; transition: background .15s; }
 .chip:hover { background: #e6d5ef; }
@@ -387,6 +388,7 @@ input[type=checkbox] { width: 19px; height: 19px; accent-color: #a067b9; flex-sh
   .filters-button { min-width: 46px; padding: 10px; border-radius: 12px; }
   .filters-button>span { display: none; }
   .filter-row { flex-wrap: wrap; gap: 8px; margin: 12px 0 19px; }
+  .filter-row>.filters-button { margin-left: 0; }
   .quick-filters { width: 100%; gap: 5px; }
   .chip { flex: 1; justify-content: center; gap: 4px; padding: 9px 7px; border-radius: 10px; font-size: 10px; white-space: nowrap; }
   .chip svg { width: 13px; }
