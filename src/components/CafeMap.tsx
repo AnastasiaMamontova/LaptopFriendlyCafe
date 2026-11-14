@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { divIcon, latLngBounds } from 'leaflet'
 import { MapContainer, Marker, Popup, TileLayer, ZoomControl, useMap } from 'react-leaflet'
 import type { Cafe } from '../types/cafe'
@@ -49,15 +49,44 @@ function MapViewport({ cafes, selectedId, address }: Pick<CafeMapProps, 'cafes' 
 }
 
 export default function CafeMap({ cafes, onSelect, selectedId }: CafeMapProps) {
+  const element = useRef<HTMLDivElement>(null)
   const [tileError, setTileError] = useState(false)
   const [tileAttempt, setTileAttempt] = useState(0)
   const [address, setAddress] = useState<BerlinAddress | null>(null)
+  useLayoutEffect(() => {
+    const frame = element.current?.closest<HTMLElement>('.map-container')
+    if (!frame) return
+    let disposed = false
+    let animation = 0
+    const navigation = document.querySelector<HTMLElement>('.mobile-nav')
+    const fit = () => {
+      if (disposed) return
+      const top = frame.getBoundingClientRect().top + window.scrollY
+      const bottom = navigation?.getBoundingClientRect().height || 80
+      const height = `${Math.max(360, Math.floor(window.innerHeight - top - bottom - 8))}px`
+      if (frame.style.height !== height) {
+        frame.style.height = height
+        frame.style.setProperty('--map-height', height)
+      }
+    }
+    const schedule = () => { cancelAnimationFrame(animation); animation = requestAnimationFrame(fit) }
+    const observer = new ResizeObserver(schedule)
+    if (frame.parentElement) observer.observe(frame.parentElement)
+    if (navigation) observer.observe(navigation)
+    window.addEventListener('resize', schedule)
+    void document.fonts.ready.then(schedule)
+    fit()
+    return () => {
+      disposed = true; observer.disconnect(); cancelAnimationFrame(animation)
+      window.removeEventListener('resize', schedule)
+    }
+  }, [])
   const validCafes = useMemo(() => cafes.filter(cafe =>
     Number.isFinite(cafe.lat) && Number.isFinite(cafe.lng) &&
     Math.abs(cafe.lat) <= 90 && Math.abs(cafe.lng) <= 180,
   ), [cafes])
 
-  return <div className="cafe-map" role="region" aria-label="Map of Berlin cafes">
+  return <div ref={element} className="cafe-map" role="region" aria-label="Map of Berlin cafes">
     <AddressSearch onSelect={setAddress} onClear={() => setAddress(null)} />
     <div className="map-canvas">
     <MapContainer center={BERLIN} zoom={12} scrollWheelZoom={false} zoomControl={false}
@@ -85,7 +114,7 @@ export default function CafeMap({ cafes, onSelect, selectedId }: CafeMapProps) {
         </Marker>
       })}
     </MapContainer>
-    {tileError && <div className="map-error" role="status" style={{ position: 'absolute', top: 12, left: 12, right: 12, zIndex: 1, padding: '10px 14px', borderRadius: 12, background: '#fff', boxShadow: '0 2px 15px #0002', fontSize: 13 }}>
+    {tileError && <div className="map-error" role="status" style={{ position: 'absolute', top: 12, left: 12, right: 12, zIndex: 1, padding: '10px 14px', borderRadius: 12, background: '#fff', boxShadow: '0 2px 15px #0002', fontSize: 16 }}>
       Could not load the map. Check your internet connection.{' '}
       <button type="button" onClick={() => { setTileError(false); setTileAttempt(value => value + 1) }} style={{ textDecoration: 'underline' }}>Retry</button>
     </div>}

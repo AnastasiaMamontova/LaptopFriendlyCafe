@@ -1,4 +1,25 @@
-# Android 1.0.2 verification — 2026-11-14
+# Full-width layout verification
+
+- Removed the top application header and welcome illustration. The main heading,
+  catalog and map now start directly at the top of the content area.
+- Removed the desktop width cap. The map runs edge to edge and adjusts its height
+  to the available viewport above the bottom navigation, with safe-area padding.
+- Increased typography throughout cards, search, filters, dialogs and weekly
+  hours. Main content uses 16–18 px text, with larger headings and readable
+  secondary labels. Font sizes use rem units.
+- Bottom navigation and the single add-cafe button remain available on mobile
+  and desktop. App installation is available from the collection footer.
+- Mobile quick filters use two columns so the larger labels remain legible.
+- The 54-test suite and production web build pass. Layout, map attribution,
+  navigation and editor overflow were checked at 320, 390, 600, 768, 1440 and
+  1920 px; no horizontal overflow or browser runtime errors were observed.
+- No APK was built for these layout changes. The 1.0.2 download documented below
+  is the previously built version.
+
+Current catalog screenshots: [mobile](screenshots/mobile.png) and
+[desktop](screenshots/desktop-demo.png). They use the local sample collection.
+
+## Android 1.0.2 verification — 2026-11-14
 
 All current feature commits were confirmed on GitHub before building.
 The 54-test suite, production web build, Android build and Android lint pass.

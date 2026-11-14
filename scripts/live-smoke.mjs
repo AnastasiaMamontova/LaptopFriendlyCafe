@@ -13,10 +13,10 @@ const name = `QA temporary ${Date.now()}`
 let createdId
 try {
   await page.goto(process.env.CAFE_TEST_URL || 'http://localhost:5173')
-  await page.getByRole('heading', { name: 'All places', exact: false }).waitFor()
+  await page.locator('.collection-heading h1').waitFor()
   await page.locator('.skeleton-grid').waitFor({ state: 'detached' })
   assert.equal(await page.locator('.connection-banner').count(), 0, 'Real backend must be reachable')
-  await page.locator('.topbar').getByRole('button', { name: 'Add cafe' }).click()
+  await page.getByRole('button', { name: 'Add cafe', exact: true }).click()
   const form = page.getByRole('dialog')
   await form.getByLabel('Name', { exact: false }).fill(name)
   await form.getByLabel('District', { exact: false }).fill('Mitte')
