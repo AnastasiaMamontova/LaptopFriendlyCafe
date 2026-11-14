@@ -1,4 +1,19 @@
-# Android 1.0.3 verification
+# Cappuccino-cat icon verification
+
+- The master PNG is byte-for-byte identical to the selected design: no steam,
+  handle on the right, and the original lavender/coral styling.
+- Browser favicon, PWA/touch icons, the in-app cafe-card emblem, Android launcher
+  icons and splash artwork now use the shared master. Previous icon assets and
+  references were removed.
+- PNG dimensions were checked for the four browser/PWA outputs and fifteen
+  Android launcher/foreground outputs.
+- Production web/PWA build and six relevant mobile/desktop interface tests pass.
+- Icon generation runs without invoking Gradle or producing an APK. Previously
+  built APKs are unchanged; this icon will be packaged in a future Android build.
+
+Regeneration instructions: [BRANDING.md](BRANDING.md).
+
+## Android 1.0.3 verification
 
 The APK includes the current full-width interface with larger text and without
 the application header. Production web build, Android build and Android lint

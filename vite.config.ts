@@ -7,16 +7,16 @@ export default defineConfig({
   build: { rollupOptions: { output: { manualChunks: { react: ['react', 'react-dom'], supabase: ['@supabase/supabase-js'] } } } },
   plugins: [react(), tailwindcss(), VitePWA({
     registerType: 'prompt',
-    includeAssets: ['icon.svg', 'icons/*.png', 'demo/*.jpg'],
+    includeAssets: ['icon.png', 'icons/*.png', 'demo/*.jpg'],
     manifest: {
       name: 'Café Berlin', short_name: 'Café Berlin',
       description: 'Your collection of laptop-friendly Berlin cafes',
       lang: 'en', start_url: '/', scope: '/', display: 'standalone',
       background_color: '#fffaf7', theme_color: '#fffaf7',
       icons: [
-        { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-        { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
-        { src: '/icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        { src: '/icons/cappuccino-cat-192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/icons/cappuccino-cat-512.png', sizes: '512x512', type: 'image/png' },
+        { src: '/icons/cappuccino-cat-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
       ],
     },
     workbox: {

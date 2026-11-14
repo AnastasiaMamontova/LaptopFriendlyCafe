@@ -8,11 +8,12 @@ if [[ -z "${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}" ]]; then
   exit 1
 fi
 
-npm run build
 if [[ ! -d android ]]; then
+  npm run build
   npx cap add android
 fi
 node scripts/android-assets.mjs
+npm run build
 npx cap sync android
 
 # Gradle generates a development signing key on the first build.

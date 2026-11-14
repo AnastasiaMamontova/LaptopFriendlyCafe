@@ -34,6 +34,9 @@ project URL and public anon key are included in browser and APK builds.
 
 ## Android and APK
 
+The app uses the cappuccino-cat icon. See [branding assets](docs/BRANDING.md)
+to regenerate browser, PWA and Android artwork without building an APK.
+
 Build the test APK locally using [scripts/android-README.md](scripts/android-README.md).
 Generated APKs are excluded from Git. Open your local APK on Android and allow
 installation from your browser or file manager.

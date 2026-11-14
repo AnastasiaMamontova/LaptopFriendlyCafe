@@ -10,7 +10,8 @@
     "test": "playwright test",
     "setup:backend": "node scripts/setup-supabase.mjs",
     "android:sync": "npm run build && cap sync android",
-    "android:build": "bash scripts/android-build.sh"
+    "android:build": "bash scripts/android-build.sh",
+    "icons:generate": "node scripts/android-assets.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.0",

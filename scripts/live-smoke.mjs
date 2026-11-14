@@ -24,7 +24,7 @@ try {
   await form.getByLabel('Latitude').fill('52.527')
   await form.getByLabel('Longitude').fill('13.405')
   await form.getByLabel('About this place').fill('Disposable end-to-end verification. This record is removed automatically.')
-  await form.getByLabel('Upload photos').setInputFiles('public/icons/icon-192.png')
+  await form.getByLabel('Upload photos').setInputFiles('public/icons/cappuccino-cat-192.png')
   await form.getByRole('checkbox', { name: 'Wi-Fi', exact: true }).check()
   await form.getByRole('checkbox', { name: 'Outlets', exact: true }).check()
   const slider = form.getByRole('slider', { name: 'Your rating' })

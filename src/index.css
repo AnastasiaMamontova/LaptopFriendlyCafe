@@ -24,6 +24,7 @@ button, a, input, select, textarea { outline-offset: 4px; }
 input, textarea, select { accent-color: #ba4670; }
 button, a { touch-action: manipulation; }
 img { display: block; max-width: 100%; }
+.app-icon { width: 100%; height: 100%; object-fit: contain; }
 h1, h2, h3, p { margin: 0; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .muted { color: var(--muted); }
@@ -258,7 +259,7 @@ input[type=checkbox] { width: 19px; height: 19px; accent-color: #a067b9; flex-sh
 .detail-hero>img { width: 100%; height: 100%; object-fit: cover; }
 .detail-hero .rating-badge { top: 16px; left: 16px; right: auto; }
 .detail-hero .rating-badge small { font-size: .875rem; font-weight: 400; }
-.detail-mascot { position: absolute; right: 22px; bottom: -20px; width: 72px; height: 72px; border: 5px solid #fffaf7; border-radius: 25px; transform: rotate(7deg); }
+.detail-mascot { position: absolute; right: 22px; bottom: -20px; width: 72px; height: 72px; border: 5px solid #fffaf7; border-radius: 25px; overflow: hidden; transform: rotate(7deg); }
 .gallery-thumbs { order: 1; display: flex; gap: 7px; padding: 16px 25px 0; overflow: auto; }
 .gallery-thumbs button { border: 2px solid transparent; padding: 0; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: transparent; }
 .gallery-thumbs button[aria-pressed=true] { border-color: #a067b9; }
