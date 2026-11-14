@@ -24,9 +24,9 @@ Open http://localhost:5173. `npm run build` produces `dist/`;
 
 Cafe records are stored in Supabase PostgreSQL and photos in Supabase Storage.
 See [supabase/README.md](supabase/README.md) for setup and field descriptions.
-Choose opening days and times from the weekly editor; see
-[opening-hours instructions](docs/OPENING_HOURS.md) for breaks, overnight hours
-and compatibility with existing records.
+Choose one opening and closing time for Monday–Friday from the weekday editor;
+see [opening-hours instructions](docs/OPENING_HOURS.md) for overnight hours and
+compatibility with existing records.
 The map also provides [Berlin address suggestions](docs/ADDRESS_SEARCH.md)
 through Photon, without API keys or billing.
 The Supabase management token stays in the development environment. Only the

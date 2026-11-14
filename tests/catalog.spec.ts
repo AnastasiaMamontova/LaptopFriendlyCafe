@@ -104,7 +104,8 @@ test('cafe details preserve amenities, complete hours, gallery and editing in th
   expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true)
   await dialog.getByRole('button', { name: 'Edit cafe details', exact: true }).click()
   await expect(page.getByLabel('Name', { exact: false })).toHaveValue('Detail Cafe')
-  await expect(page.getByLabel('Sunday hours', { exact: true })).toHaveValue('closed')
+  await expect(page.locator('.hours-saved-note')).toContainText('Sun Closed')
+  await expect(page.locator('.hours-editor').getByRole('combobox')).toHaveCount(4)
   await expect(page.getByRole('button', { name: /Remove photo/ })).toHaveCount(2)
 })
 

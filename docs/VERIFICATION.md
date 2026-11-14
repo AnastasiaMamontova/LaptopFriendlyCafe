@@ -1,4 +1,21 @@
-# Android 1.0.4 verification
+# Weekday hours editor verification
+
+- Replaced seven day rows, status selectors, copy controls and additional periods
+  with a fixed Weekdays / Monday–Friday card and four hour/minute selectors.
+- A single interval saves as `Mon–Fri 08:00–17:00`. Exact minutes, reload/edit,
+  empty hours, clearing both times, partial-input validation and overnight closing
+  are covered. Existing complex schedules and free text survive unrelated edits.
+- All 62 Playwright tests passed across mobile and desktop. TypeScript and the
+  production Vite/PWA build passed. Test backend requests were intercepted.
+- The production form was checked at widths of 320, 390 and 1440 px without
+  horizontal overflow or browser runtime errors. At 320 px the time fields stack.
+- [Mobile screenshot](screenshots/opening-hours-mobile.png) and
+  [opening-hours field](screenshots/weekday-hours-field.png) use illustrative
+  fixture data. No production records were changed.
+- No APK was built for this change. The existing versioned 1.0.4 APK is unchanged
+  and does not include this editor simplification.
+
+## Android 1.0.4 verification
 
 The current APK includes all interface changes, the approved cappuccino-cat
 launcher icon and the redesigned cafe detail page. Production web build, Android

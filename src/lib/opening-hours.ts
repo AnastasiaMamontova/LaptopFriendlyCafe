@@ -105,3 +105,26 @@ export function openingHoursError(value: string): string {
   const parsed = parseOpeningHours(value)
   return parsed ? validateWeeklyHours(parsed) : ''
 }
+
+// The editor accepts one range for Monday through Friday. Keep the weekly parser
+// above for existing records and older app versions.
+export function readWeekdayPeriod(value: string): OpeningPeriod | null {
+  const week = parseOpeningHours(value)
+  if (!week || week.slice(5).some(day => day.status !== 'unknown')) return null
+  const first = week[0]
+  if (first.status !== 'open' || first.periods.length !== 1) return null
+  const period = first.periods[0]
+  return week.slice(0, 5).every(day => day.status === 'open' && day.periods.length === 1 && day.periods[0].opens === period.opens && day.periods[0].closes === period.closes) ? { ...period } : null
+}
+
+export function weekdayHoursError(period: OpeningPeriod): string {
+  if (!period.opens && !period.closes) return ''
+  if (![period.opens, period.closes].every(time => new RegExp(`^${timePattern}$`).test(time))) return 'Choose both opening and closing times.'
+  if (period.opens === period.closes) return 'Opening and closing times must differ.'
+  return ''
+}
+
+export function serializeWeekdayHours(period: OpeningPeriod): string {
+  if ((!period.opens && !period.closes) || weekdayHoursError(period)) return ''
+  return serializeOpeningHours(weekDays.map((_, index) => index < 5 ? { status: 'open', periods: [{ ...period }] } : { status: 'unknown', periods: [] }))
+}
