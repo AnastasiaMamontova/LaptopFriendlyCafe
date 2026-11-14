@@ -1,4 +1,12 @@
-# Full-width layout verification
+# Android 1.0.3 verification
+
+The APK includes the current full-width interface with larger text and without
+the application header. Production web build, Android build and Android lint
+pass. Its signature matches 1.0.2, and all 23 bundled web files match `dist/`.
+See [release verification](ANDROID_RELEASE_1.0.3.md) for the checksum and details.
+The APK is excluded from Git. Physical-device testing was not performed.
+
+## Full-width layout verification
 
 - Removed the top application header and welcome illustration. The main heading,
   catalog and map now start directly at the top of the content area.
@@ -13,8 +21,7 @@
 - The 54-test suite and production web build pass. Layout, map attribution,
   navigation and editor overflow were checked at 320, 390, 600, 768, 1440 and
   1920 px; no horizontal overflow or browser runtime errors were observed.
-- No APK was built for these layout changes. The 1.0.2 download documented below
-  is the previously built version.
+- These layout changes are included in Android 1.0.3, documented above.
 
 Current catalog screenshots: [mobile](screenshots/mobile.png) and
 [desktop](screenshots/desktop-demo.png). They use the local sample collection.
