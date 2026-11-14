@@ -12,7 +12,7 @@ export default defineConfig({
       name: 'Café Berlin', short_name: 'Café Berlin',
       description: 'Your collection of laptop-friendly Berlin cafes',
       lang: 'en', start_url: '/', scope: '/', display: 'standalone',
-      background_color: '#f7f7f2', theme_color: '#183d33',
+      background_color: '#fffaf7', theme_color: '#fffaf7',
       icons: [
         { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
         { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
@@ -20,7 +20,7 @@ export default defineConfig({
       ],
     },
     workbox: {
-      globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+      globPatterns: ['**/*.{js,css,html,svg,png,woff2,ttf}'],
       navigateFallback: '/index.html',
       // Cafe data is cached explicitly by the application, never cache API writes.
       runtimeCaching: [{

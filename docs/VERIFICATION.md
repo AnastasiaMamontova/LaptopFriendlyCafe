@@ -1,4 +1,26 @@
-# Build verification
+# UI refresh verification — 2026-11-14
+
+- English interface refreshed with warm ivory, lavender and coral colors,
+  local vector illustrations, cafe cards, map previews and updated dialogs.
+- TypeScript and the production Vite/PWA build pass.
+- All 18 existing Playwright tests pass against an intercepted test API;
+  no live cafe records or photos were changed during this refresh.
+- Layout checked at widths 320, 390, 768 and 1440 px without horizontal overflow.
+  The welcome search button focuses the catalog search field.
+- Map markers and clickable cafe previews pass with intercepted tiles. A live
+  OpenStreetMap tile download returns HTTP 200 through the environment's trusted
+  HTTPS client, but isolated headless Chromium rejects the environment proxy CA
+  (`ERR_CERT_AUTHORITY_INVALID`). Live tiles were not verified in that browser;
+  certificate validation was kept enabled.
+- Production service worker and offline reload checked with a local fixture
+  collection: all three photos, the illustrations and the three local font files
+  remain available offline. PWA manifest theme matches the new interface.
+- Nunito Sans is self-hosted under the license in `public/fonts/OFL.txt`.
+- No Android APK was built for this refresh. No site or environment was published.
+
+Screenshots below use the explicit sample collection, not production records.
+
+## Original application verification (before the UI refresh)
 
 - TypeScript and the production Vite/PWA build pass.
 - Playwright: **18/18 passing**, covering mobile 390×844 and desktop 1440×1000 layouts.
