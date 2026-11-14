@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { divIcon, latLngBounds } from 'leaflet'
 import { MapContainer, Marker, Popup, TileLayer, ZoomControl, useMap } from 'react-leaflet'
 import type { Cafe } from '../types/cafe'
+import AddressSearch from './AddressSearch'
+import type { BerlinAddress } from '../lib/address-search'
 
 interface CafeMapProps {
   cafes: Cafe[]
@@ -11,12 +13,14 @@ interface CafeMapProps {
 
 const BERLIN: [number, number] = [52.52, 13.405]
 
-function MapViewport({ cafes, selectedId }: Pick<CafeMapProps, 'cafes' | 'selectedId'>) {
+function MapViewport({ cafes, selectedId, address }: Pick<CafeMapProps, 'cafes' | 'selectedId'> & { address: BerlinAddress | null }) {
   const map = useMap()
   const coordinates = cafes.map(cafe => `${cafe.id}:${cafe.lat}:${cafe.lng}`).join('|')
 
   useEffect(() => {
-    if (cafes.length) {
+    if (address) {
+      map.setView([address.lat, address.lng], 17, { animate: false })
+    } else if (cafes.length) {
       map.fitBounds(latLngBounds(cafes.map(cafe => [cafe.lat, cafe.lng])), {
         padding: [45, 45], maxZoom: 14, animate: false,
       })
@@ -25,7 +29,7 @@ function MapViewport({ cafes, selectedId }: Pick<CafeMapProps, 'cafes' | 'select
     }
     // The coordinate signature prevents unrelated parent renders from resetting the map.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, coordinates])
+  }, [map, coordinates, address])
 
   useEffect(() => {
     const selected = cafes.find(cafe => cafe.id === selectedId)
@@ -47,21 +51,25 @@ function MapViewport({ cafes, selectedId }: Pick<CafeMapProps, 'cafes' | 'select
 export default function CafeMap({ cafes, onSelect, selectedId }: CafeMapProps) {
   const [tileError, setTileError] = useState(false)
   const [tileAttempt, setTileAttempt] = useState(0)
+  const [address, setAddress] = useState<BerlinAddress | null>(null)
   const validCafes = useMemo(() => cafes.filter(cafe =>
     Number.isFinite(cafe.lat) && Number.isFinite(cafe.lng) &&
     Math.abs(cafe.lat) <= 90 && Math.abs(cafe.lng) <= 180,
   ), [cafes])
 
-  return <div className="cafe-map" role="region" aria-label="Map of Berlin cafes" style={{ position: 'relative', height: '100%', minHeight: 360 }}>
+  return <div className="cafe-map" role="region" aria-label="Map of Berlin cafes">
+    <AddressSearch onSelect={setAddress} onClear={() => setAddress(null)} />
+    <div className="map-canvas">
     <MapContainer center={BERLIN} zoom={12} scrollWheelZoom={false} zoomControl={false}
-      style={{ height: '100%', minHeight: 360, width: '100%', zIndex: 0 }}>
+      style={{ height: '100%', width: '100%', zIndex: 0 }}>
       <TileLayer key={tileAttempt}
         attribution={'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         maxZoom={19}
         eventHandlers={{ tileerror: () => setTileError(true) }} />
       <ZoomControl position="bottomright" />
-      <MapViewport cafes={validCafes} selectedId={selectedId} />
+      <MapViewport cafes={validCafes} selectedId={selectedId} address={address} />
+      {address && <Marker position={[address.lat, address.lng]} title={address.label} alt={`Address: ${address.label}`} icon={divIcon({ className: 'address-location-marker', html: '<span aria-hidden="true">⌖</span>', iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -32] })}><Popup><strong>{address.label}</strong><br />{address.context}</Popup></Marker>}
       {validCafes.map(cafe => {
         const rating = Number.isFinite(cafe.rating) ? cafe.rating.toFixed(1) : '—'
         const icon = divIcon({
@@ -81,5 +89,6 @@ export default function CafeMap({ cafes, onSelect, selectedId }: CafeMapProps) {
       Could not load the map. Check your internet connection.{' '}
       <button type="button" onClick={() => { setTileError(false); setTileAttempt(value => value + 1) }} style={{ textDecoration: 'underline' }}>Retry</button>
     </div>}
+    </div>
   </div>
 }

@@ -1,4 +1,21 @@
-# Opening-hours editor verification — 2026-11-14
+# Berlin address search verification — 2026-11-14
+
+- TypeScript and production Vite/PWA build pass.
+- Playwright: **54/54 passing**, including all 40 existing checks and 14 new
+  address parsing/request and browser checks across mobile and desktop.
+- Verified debouncing, short-query suppression, cancellation of stale results,
+  memory caching, mouse/keyboard selection, clearing and map positioning,
+  rejection of neighboring-city addresses, retry, empty results and offline mode.
+- Layout checked at 320, 390, 768 and 1440 px without horizontal overflow.
+- A public Photon response and browser/Capacitor-origin CORS headers were checked
+  through the trusted HTTPS client. Browser tests intercept provider and tile
+  requests. No production cafe records or photos were changed.
+- The existing Leaflet/OpenStreetMap map remains in use. No billing, new API
+  keys, database migration, APK build or deployment was introduced.
+
+Service usage and configuration: [ADDRESS_SEARCH.md](ADDRESS_SEARCH.md).
+
+## Opening-hours editor verification — 2026-11-14
 
 - TypeScript and the production Vite/PWA build pass.
 - Playwright: **40/40 passing** across mobile and desktop projects, including all
