@@ -1,4 +1,13 @@
-# Cafe detail design verification
+# Android 1.0.4 verification
+
+The current APK includes all interface changes, the approved cappuccino-cat
+launcher icon and the redesigned cafe detail page. Production web build, Android
+build, Android lint, signature verification and a byte-for-byte comparison of all
+23 bundled web files pass. The certificate matches Android 1.0.3.
+See [release verification](ANDROID_RELEASE_1.0.4.md) for the checksum and details.
+The APK is excluded from Git. Physical-device testing was not performed.
+
+## Cafe detail design verification
 
 - Implemented the approved design with a full-screen mobile detail view, 36 px
   cafe title, 20 px body text and amenity labels, and 24 px section headings.
@@ -15,7 +24,8 @@
 - Screenshots use illustrative fixture data and local photos, without changing
   production records. Checked widths of 320, 390 and 1440 px with no horizontal
   overflow or browser runtime errors.
-- No APK was built. The existing Android 1.0.3 APK checksum is unchanged.
+- No APK was built during the initial UI change. These changes are now included
+  in Android 1.0.4, documented above; the versioned 1.0.3 APK remains unchanged.
 
 Screenshots: [mobile](screenshots/mobile-details.png),
 [complete mobile page](screenshots/cafe-details-full.png),
@@ -33,7 +43,7 @@ Screenshots: [mobile](screenshots/mobile-details.png),
   Android launcher/foreground outputs.
 - Production web/PWA build and six relevant mobile/desktop interface tests pass.
 - Icon generation runs without invoking Gradle or producing an APK. Previously
-  built APKs are unchanged; this icon will be packaged in a future Android build.
+  built APKs are unchanged; this icon is now packaged in Android 1.0.4.
 
 Regeneration instructions: [BRANDING.md](BRANDING.md).
 
