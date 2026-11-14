@@ -74,6 +74,40 @@ async function setRange(page: Page, selector: string, value: string) {
   }, value)
 }
 
+test('cafe details preserve amenities, complete hours, gallery and editing in the large-text layout', async ({ page }) => {
+  const photos = ['one', 'two'].map(name => `https://ui-test.supabase.co/storage/v1/object/public/cafe-photos/${name}.jpg`)
+  await mockBackend(page, [fixture(initialCafes[0].id, 'Detail Cafe', 'Mitte', 4.7, {
+    wifi: false, laptop_friendly: false, noise: 'lively', photos,
+    hours: 'Mon–Fri 09:00–18:00\nSat 10:00–16:00\nSun Closed',
+  })])
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Open Detail Cafe', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  const amenities = dialog.getByRole('list', { name: 'Work essentials' })
+  await expect(amenities.getByRole('listitem')).toHaveCount(4)
+  await expect(amenities.getByText('No / not confirmed', { exact: true })).toHaveCount(2)
+  await expect(amenities).toContainText('Lively')
+  await expect(amenities.getByText('Quiet', { exact: true })).toHaveCount(0)
+  await expect(dialog.locator('.detail-rating')).toHaveText('4.7Your rating')
+  await expect(dialog.getByRole('heading', { name: 'About this café' })).toBeVisible()
+  await expect(dialog.locator('.detail-description')).toHaveCSS('font-size', '20px')
+  const hours = dialog.getByRole('region', { name: 'Opening hours schedule' })
+  await expect(hours).toHaveText('Mon–Fri 09:00–18:00 · Sat 10:00–16:00 · Sun Closed')
+  await expect(hours).toHaveCSS('white-space', 'nowrap')
+  await hours.focus()
+  await page.keyboard.press('End')
+  await expect(dialog.getByRole('link', { name: 'Visit website' })).toHaveAttribute('href', 'https://example.com')
+  await expect(dialog.getByRole('link', { name: 'Get directions' })).toHaveAttribute('href', /destination=52.52,13.405/)
+  await dialog.getByRole('button', { name: 'Show photo 2', exact: true }).click()
+  await expect(dialog.getByRole('button', { name: 'Show photo 2', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(dialog.locator('.detail-hero>img')).toHaveAttribute('src', photos[1])
+  expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true)
+  await dialog.getByRole('button', { name: 'Edit cafe details', exact: true }).click()
+  await expect(page.getByLabel('Name', { exact: false })).toHaveValue('Detail Cafe')
+  await expect(page.getByLabel('Sunday hours', { exact: true })).toHaveValue('closed')
+  await expect(page.getByRole('button', { name: /Remove photo/ })).toHaveCount(2)
+})
+
 for (const mode of ['search, filters and sorting', 'map and card', 'create edit delete and photos', 'offline cache'] as const) {
   test(mode, async ({ page }, testInfo) => {
     const backend = await mockBackend(page)
@@ -115,7 +149,7 @@ for (const mode of ['search, filters and sorting', 'map and card', 'create edit 
       await page.locator('.cafe-marker[title="Alpha Coffee"]').click()
       const detail = page.getByRole('dialog')
       await expect(detail.getByRole('heading', { name: 'Alpha Coffee', exact: true })).toBeVisible()
-      await expect(detail.getByRole('button', { name: 'Edit', exact: true })).toBeVisible()
+      await expect(detail.getByRole('button', { name: 'Edit café', exact: true })).toBeVisible()
       await expect(detail.getByRole('link', { name: /Get directions/ })).toHaveAttribute('href', /destination=52.52,13.405/)
       await expect(detail.getByRole('button', { name: /Sign in|Sign up/ })).toHaveCount(0)
       await page.screenshot({ path: `test-results/detail-${testInfo.project.name}.png`, animations: 'disabled' })
@@ -140,7 +174,7 @@ for (const mode of ['search, filters and sorting', 'map and card', 'create edit 
       expect(create.body.rating).toBe(4.3)
       expect(create.body.photos).toHaveLength(1)
       await page.getByRole('button', { name: 'Open Delta Work Cafe', exact: true }).click()
-      await page.getByRole('button', { name: 'Edit', exact: true }).click()
+      await page.getByRole('button', { name: 'Edit café', exact: true }).click()
       await page.getByLabel('Name', { exact: false }).fill('Delta Updated')
       await page.getByRole('button', { name: 'Remove photo 1' }).click()
       await page.getByRole('button', { name: 'Save changes' }).click()
@@ -179,7 +213,7 @@ test('empty catalog and explicit demo do not write to backend', async ({ page })
   await expect(page.locator('.demo-banner')).toContainText('Demo')
   await page.locator('.cafe-card').first().click()
   await expect(page.getByRole('dialog')).toContainText('Names and details are illustrative')
-  await expect(page.getByRole('button', { name: 'Edit', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Edit café', exact: true })).toHaveCount(0)
   expect(backend.writes).toEqual([])
 })
 

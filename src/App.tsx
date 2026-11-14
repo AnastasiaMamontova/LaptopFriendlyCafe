@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
-import { ArrowDownWideNarrow, ArrowUpRight, Check, Coffee, Download, ExternalLink, Grid2X2, Headphones, Laptop, LoaderCircle, Map, MapPin, Pencil, Plus, RefreshCw, Search, SlidersHorizontal, Sparkles, Star, Trash2, Wifi, WifiOff, X, Zap, Clock3 } from 'lucide-react'
+import { ArrowDownWideNarrow, ArrowLeft, ArrowUpRight, Check, Coffee, Download, ExternalLink, Grid2X2, Headphones, Laptop, LoaderCircle, Map, MapPin, Navigation, Pencil, Plus, RefreshCw, Search, SlidersHorizontal, Sparkles, Star, Trash2, Wifi, WifiOff, X, Zap, Clock3 } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import { Capacitor } from '@capacitor/core'
 import type { Cafe } from './types/cafe'
@@ -41,14 +41,36 @@ function CafeCard({ cafe, onClick }: { cafe: Cafe; onClick: () => void }) {
 function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; demo: boolean; onClose: () => void; onEdit: () => void; onDelete: () => void }) {
   const [photo, setPhoto] = useState(0)
   const mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${cafe.lat},${cafe.lng}`
-  return <Modal open onOpenChange={o => !o && onClose()} title={cafe.name} description={cafe.district} className="detail-modal">
-    <div className="detail-hero">{photo === 0 ? <Photo cafe={cafe} /> : <img src={cafe.photos[photo]} alt={`Photo ${cafe.name}, ${photo+1}`} />}<span className="rating-badge"><Star size={14} fill="currentColor" />{formatRating(cafe.rating)} <small>your rating</small></span><span className="detail-mascot"><CatMark /></span></div>
+  const amenities = [
+    { label: 'Wi-Fi', icon: Wifi, available: cafe.wifi },
+    { label: 'Outlets', icon: Zap, available: cafe.sockets },
+    { label: cafe.noise === 'quiet' ? 'Quiet' : 'Atmosphere', icon: Headphones, available: true, detail: cafe.noise === 'quiet' ? '' : noiseLabels[cafe.noise] },
+    { label: 'Laptops welcome', icon: Laptop, available: cafe.laptop_friendly },
+  ]
+  return <Modal open onOpenChange={o => !o && onClose()} title={cafe.name} description={cafe.district} className="detail-modal" closeIcon={<ArrowLeft size={28} />} headingContent={
+    <div className="detail-rating"><Star size={27} fill="currentColor" aria-hidden="true" /><strong>{formatRating(cafe.rating)}</strong><span>Your rating</span></div>
+  }>
+    <div className="detail-hero">
+      {photo === 0 ? <Photo cafe={cafe} /> : <img src={cafe.photos[photo]} alt={`Photo ${cafe.name}, ${photo+1}`} />}
+      {!demo && <button className="detail-hero-edit" onClick={onEdit} aria-label="Edit cafe details"><Pencil size={25} /></button>}
+      <span className="detail-mascot"><CatMark /></span>
+    </div>
     {cafe.photos.length > 1 && <div className="gallery-thumbs">{cafe.photos.map((url,i) => <button key={url} onClick={() => setPhoto(i)} aria-label={`Show photo ${i+1}`} aria-pressed={photo === i}><img src={url} alt="" /></button>)}</div>}
-    <div className="detail-body">{demo && <div className="demo-notice"><Sparkles size={16} /> Sample card. Names and details are illustrative.</div>}<Features cafe={cafe} /><p className="detail-description">{cafe.description || 'No description yet.'}</p>
-      <div className="detail-facts"><div><MapPin size={20} /><div><small>Address</small><p>{cafe.address}</p></div></div><div><Clock3 size={20} /><div><small>Opening hours</small><OpeningHours value={cafe.hours} /></div></div><div><Headphones size={20} /><div><small>Atmosphere</small><p>{noiseLabels[cafe.noise]}</p></div></div></div>
-      <div className="detail-amenities"><h3>Work essentials</h3>{[[cafe.wifi,'Wi-Fi'],[cafe.sockets,'Outlets'],[cafe.laptop_friendly,'Laptops welcome']].map(([yes,label]) => <p key={String(label)}><span>{label}</span><span className={yes ? 'available' : 'unavailable'}>{yes ? <><Check size={16} /> Available</> : 'No / not confirmed'}</span></p>)}</div>
-      {!demo && <div className="detail-links"><Button asChild><a href={mapUrl} target="_blank" rel="noreferrer"><MapPin size={17} />Get directions<ArrowUpRight size={15} /></a></Button>{/^https?:\/\//i.test(cafe.website) && <Button variant="outline" asChild><a href={cafe.website} target="_blank" rel="noreferrer">Cafe website<ExternalLink size={15} /></a></Button>}</div>}
-      {!demo && <div className="detail-edit"><Button variant="ghost" onClick={onEdit}><Pencil size={16} />Edit</Button><Button variant="ghost" className="text-danger" onClick={onDelete}><Trash2 size={16} />Delete</Button></div>}
+    <div className="detail-body">
+      {demo && <div className="demo-notice"><Sparkles size={16} /> Sample card. Names and details are illustrative.</div>}
+      <ul className="detail-essentials" aria-label="Work essentials">{amenities.map(({ label, icon: Icon, available, detail }) =>
+        <li key={label} className={`detail-amenity${available ? '' : ' detail-amenity-unconfirmed'}`}>
+          <Icon size={36} aria-hidden="true" /><span>{label}</span>
+          {(!available || detail) && <small>{available ? detail : 'No / not confirmed'}</small>}
+        </li>
+      )}</ul>
+      <section className="detail-about"><h3>About this café</h3><p className="detail-description">{cafe.description || 'No description yet.'}</p></section>
+      <div className="detail-facts">
+        <section><MapPin size={28} aria-hidden="true" /><div><h3>Address</h3><p>{cafe.address}</p></div></section>
+        <section><Clock3 size={28} aria-hidden="true" /><div><h3>Opening hours</h3><OpeningHours value={cafe.hours} /></div></section>
+      </div>
+      {!demo && <div className="detail-links"><Button asChild><a href={mapUrl} target="_blank" rel="noreferrer"><Navigation size={25} />Get directions</a></Button>{/^https?:\/\//i.test(cafe.website) && <Button variant="outline" asChild><a href={cafe.website} target="_blank" rel="noreferrer"><ExternalLink size={24} />Visit website</a></Button>}</div>}
+      {!demo && <div className="detail-edit"><Button variant="ghost" onClick={onEdit}>Edit café</Button><Button variant="ghost" className="text-danger" onClick={onDelete}><Trash2 size={18} />Delete</Button></div>}
     </div>
   </Modal>
 }

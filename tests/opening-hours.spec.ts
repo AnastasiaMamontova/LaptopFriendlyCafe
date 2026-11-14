@@ -67,7 +67,7 @@ async function backend(page: Page, hours = '') {
 
 async function edit(page: Page) {
   await page.getByRole('button', { name: 'Open Schedule Cafe', exact: true }).click()
-  await page.getByRole('button', { name: 'Edit', exact: true }).click()
+  await page.getByRole('button', { name: 'Edit café', exact: true }).click()
 }
 
 async function time(page: Page, label: string, value: string) {
@@ -96,11 +96,10 @@ test('creates uniform weekly hours using only lists, then reloads and edits them
   expect(writes[0].hours).toBe('Mon–Fri 09:00–18:30\nSat 10:15–16:00\nSun Closed')
   await page.reload()
   await page.getByRole('button', { name: 'Open Weekly Cafe', exact: true }).click()
-  const schedule = page.getByRole('dialog').getByLabel('Weekly opening hours')
-  await expect(schedule).toContainText('Monday')
-  await expect(schedule).toContainText('09:00–18:30')
-  await expect(schedule).toContainText('Closed')
-  await page.getByRole('button', { name: 'Edit', exact: true }).click()
+  const schedule = page.getByRole('dialog').getByRole('region', { name: 'Opening hours schedule' })
+  await expect(schedule).toHaveText('Mon–Fri 09:00–18:30 · Sat 10:15–16:00 · Sun Closed')
+  await expect(schedule).toHaveCSS('white-space', 'nowrap')
+  await page.getByRole('button', { name: 'Edit café', exact: true }).click()
   await expect(page.getByLabel('Friday period 1 closes minute')).toHaveValue('30')
   await expect(page.getByLabel('Saturday period 1 opens minute')).toHaveValue('15')
   await expect(page.getByLabel('Sunday hours', { exact: true })).toHaveValue('closed')

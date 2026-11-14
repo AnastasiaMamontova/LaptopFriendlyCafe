@@ -28,8 +28,12 @@ Sun Closed
 ```
 
 This keeps saved schedules readable by older app versions and tools. The current
-app shows a weekly table, including unspecified days. Both regular data and the
-offline catalog cache use the same representation.
+app shows a single-line summary, grouping consecutive days with the same hours
+and separating groups with a middle dot. Long schedules scroll horizontally
+(with keyboard focus available) so weekends, split shifts and overnight periods
+remain accessible at the larger font size. Unspecified days are not represented
+as closed. Both regular data and the offline catalog cache use the same storage
+representation.
 
 Existing unambiguous English schedules such as `Daily 08:00–20:00` and
 `Mon–Fri 09:00–18:00, Sat–Sun 10:00–17:00` can be edited with the selectors.

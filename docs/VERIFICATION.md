@@ -1,4 +1,28 @@
-# Cappuccino-cat icon verification
+# Cafe detail design verification
+
+- Implemented the approved design with a full-screen mobile detail view, 36 px
+  cafe title, 20 px body text and amenity labels, and 24 px section headings.
+- Personal rating appears below the district. Four large amenity tiles preserve
+  unknown availability and the actual atmosphere; a lively cafe is not labelled quiet.
+- Opening hours remain on one line with consecutive identical days grouped.
+  Complete schedules, including weekends and overnight periods, scroll horizontally
+  and support keyboard focus. Editing and stored hours are unchanged.
+- Gallery selection, both edit controls, deletion, directions and website links
+  remain functional. Sample cards remain read-only.
+- All 56 Playwright tests passed across mobile and desktop, including CRUD, photos,
+  hours selectors, address search and offline cache. TypeScript and the production
+  web/PWA build passed. Backend requests in automated tests were intercepted.
+- Screenshots use illustrative fixture data and local photos, without changing
+  production records. Checked widths of 320, 390 and 1440 px with no horizontal
+  overflow or browser runtime errors.
+- No APK was built. The existing Android 1.0.3 APK checksum is unchanged.
+
+Screenshots: [mobile](screenshots/mobile-details.png),
+[complete mobile page](screenshots/cafe-details-full.png),
+[desktop](screenshots/desktop-details.png),
+[320 px screen](screenshots/small-details.png).
+
+## Cappuccino-cat icon verification
 
 - The master PNG is byte-for-byte identical to the selected design: no steam,
   handle on the right, and the original lavender/coral styling.
