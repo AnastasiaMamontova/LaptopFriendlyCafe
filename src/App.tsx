@@ -1,5 +1,5 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
-import { ArrowDownWideNarrow, ArrowLeft, ArrowUpRight, Check, Coffee, ExternalLink, Grid2X2, Headphones, Laptop, LoaderCircle, Map, MapPin, Navigation, Pencil, Plus, RefreshCw, Search, SlidersHorizontal, Sparkles, Star, Trash2, Wifi, WifiOff, X, Zap, Clock3 } from 'lucide-react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
+import { ArrowDownWideNarrow, ArrowLeft, ArrowUpRight, Check, Coffee, ExternalLink, Grid2X2, Headphones, Laptop, LoaderCircle, Map, MapPin, Maximize2, Navigation, Pencil, Plus, RefreshCw, Search, SlidersHorizontal, Sparkles, Star, Trash2, Wifi, WifiOff, X, Zap, Clock3 } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import { Capacitor } from '@capacitor/core'
 import type { Cafe } from './types/cafe'
@@ -10,6 +10,7 @@ import { Button } from './components/ui/button'
 import { Modal } from './components/ui/dialog'
 import CafeEditor from './components/CafeEditor'
 import OpeningHours from './components/OpeningHours'
+import PhotoViewer from './components/PhotoViewer'
 import { CatMark } from './components/BrandArt'
 const CafeMap = lazy(() => import('./components/CafeMap'))
 const CACHE_KEY = 'cafe-berlin-catalog-v1'
@@ -39,6 +40,12 @@ function CafeCard({ cafe, onClick }: { cafe: Cafe; onClick: () => void }) {
 
 function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; demo: boolean; onClose: () => void; onEdit: () => void; onDelete: () => void }) {
   const [photo, setPhoto] = useState(0)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const photoTrigger = useRef<HTMLButtonElement | null>(null)
+  function showPhoto(index: number, event: MouseEvent<HTMLButtonElement>) {
+    photoTrigger.current = event.currentTarget
+    setPhoto(index); setViewerOpen(true)
+  }
   const mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${cafe.lat},${cafe.lng}`
   const amenities = [
     { label: 'Wi-Fi', icon: Wifi, available: cafe.wifi },
@@ -50,11 +57,14 @@ function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; de
     <div className="detail-rating"><Star size={27} fill="currentColor" aria-hidden="true" /><strong>{formatRating(cafe.rating)}</strong><span>Your rating</span></div>
   }>
     <div className="detail-hero">
-      {photo === 0 ? <Photo cafe={cafe} /> : <img src={cafe.photos[photo]} alt={`Photo ${cafe.name}, ${photo+1}`} />}
+      {cafe.photos.length ? <button className="detail-photo" aria-label={`Enlarge photo ${photo + 1} of ${cafe.photos.length}`} onClick={event => showPhoto(photo, event)}>
+        {photo === 0 ? <Photo cafe={cafe} /> : <img src={cafe.photos[photo]} alt={`Photo ${cafe.name}, ${photo+1}`} />}
+        <span className="detail-photo-expand" aria-hidden="true"><Maximize2 size={21} /></span>
+      </button> : <Photo cafe={cafe} />}
       {!demo && <button className="detail-hero-edit" onClick={onEdit} aria-label="Edit cafe details"><Pencil size={25} /></button>}
       <span className="detail-mascot"><CatMark /></span>
     </div>
-    {cafe.photos.length > 1 && <div className="gallery-thumbs">{cafe.photos.map((url,i) => <button key={url} onClick={() => setPhoto(i)} aria-label={`Show photo ${i+1}`} aria-pressed={photo === i}><img src={url} alt="" /></button>)}</div>}
+    {cafe.photos.length > 1 && <div className="gallery-thumbs">{cafe.photos.map((url,i) => <button key={`${url}-${i}`} onClick={event => showPhoto(i, event)} aria-label={`Show photo ${i+1}`} aria-pressed={photo === i}><img src={url} alt="" /></button>)}</div>}
     <div className="detail-body">
       {demo && <div className="demo-notice"><Sparkles size={16} /> Sample card. Names and details are illustrative.</div>}
       <ul className="detail-essentials" aria-label="Work essentials">{amenities.map(({ label, icon: Icon, available, detail }) =>
@@ -71,6 +81,7 @@ function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; de
       {!demo && <div className="detail-links"><Button asChild><a href={mapUrl} target="_blank" rel="noreferrer"><Navigation size={25} />Get directions</a></Button>{/^https?:\/\//i.test(cafe.website) && <Button variant="outline" asChild><a href={cafe.website} target="_blank" rel="noreferrer"><ExternalLink size={24} />Visit website</a></Button>}</div>}
       {!demo && <div className="detail-edit"><Button variant="ghost" onClick={onEdit}>Edit cafe</Button><Button variant="ghost" className="text-danger" onClick={onDelete}><Trash2 size={18} />Delete</Button></div>}
     </div>
+    <PhotoViewer open={viewerOpen} onOpenChange={setViewerOpen} photos={cafe.photos} cafeName={cafe.name} index={photo} onIndexChange={setPhoto} returnFocusRef={photoTrigger} />
   </Modal>
 }
 

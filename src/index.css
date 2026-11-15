@@ -243,8 +243,11 @@ input[type=checkbox] { width: 19px; height: 19px; accent-color: #a067b9; flex-sh
 .detail-modal .close-button { left: 16px; right: auto; z-index: 5; }
 .detail-hero-edit { right: 16px; }
 .detail-hero { order: 0; height: 300px; position: relative; }
-.detail-hero>img { width: 100%; height: 100%; object-fit: cover; }
-.detail-mascot { position: absolute; z-index: 5; right: 22px; bottom: -20px; width: 80px; height: 80px; border: 6px solid #fffaf7; border-radius: 50%; overflow: hidden; }
+.detail-photo { display: block; position: relative; width: 100%; height: 100%; padding: 0; background: transparent; cursor: zoom-in; }
+.detail-photo:focus-visible { outline-offset: -5px; }
+.detail-photo>img { width: 100%; height: 100%; object-fit: cover; }
+.detail-photo-expand { position: absolute; left: 16px; bottom: 16px; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; color: white; background: #251a3199; pointer-events: none; }
+.detail-mascot { position: absolute; z-index: 5; right: 22px; bottom: -20px; width: 80px; height: 80px; border: 6px solid #fffaf7; border-radius: 50%; overflow: hidden; pointer-events: none; }
 .detail-rating { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; padding: 9px 14px; border-radius: 18px; background: var(--lavender); font-size: 1.25rem; line-height: 1.35; }
 .detail-rating svg { color: var(--coral); flex-shrink: 0; }
 .detail-rating strong { font-size: 1.75rem; font-weight: 800; }
@@ -252,6 +255,22 @@ input[type=checkbox] { width: 19px; height: 19px; accent-color: #a067b9; flex-sh
 .gallery-thumbs button { border: 2px solid transparent; padding: 0; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: transparent; }
 .gallery-thumbs button[aria-pressed=true] { border-color: #a067b9; }
 .gallery-thumbs img { width: 68px; height: 50px; object-fit: cover; }
+.photo-viewer-overlay { position: fixed; inset: 0; z-index: 300; background: #17111e; }
+.photo-viewer { position: fixed; inset: 0; z-index: 301; display: flex; flex-direction: column; width: 100%; height: 100dvh; color: #fffaf7; background: #17111e; padding-bottom: env(safe-area-inset-bottom); overflow: hidden; overscroll-behavior: contain; }
+.photo-viewer-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: max(14px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 14px max(16px, env(safe-area-inset-left)); flex-shrink: 0; }
+.photo-viewer-header>div { min-width: 0; }
+.photo-viewer-title { font-size: 1.25rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.photo-viewer-count { margin-top: 3px; font-size: 1rem; color: #d3c5dd; }
+.photo-viewer-close, .photo-viewer-previous, .photo-viewer-next { display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 1px solid #ffffff40; border-radius: 50%; color: #fffaf7; background: #251a31cc; flex-shrink: 0; }
+.photo-viewer-close:hover, .photo-viewer-previous:hover, .photo-viewer-next:hover { background: #584361; }
+.photo-viewer-stage { flex: 1; min-height: 0; position: relative; display: grid; place-items: center; touch-action: pan-y pinch-zoom; }
+.photo-viewer-image { width: 100%; height: 100%; min-height: 0; object-fit: contain; user-select: none; }
+.photo-viewer-previous, .photo-viewer-next { position: absolute; top: 50%; transform: translateY(-50%); }
+.photo-viewer-previous { left: max(10px, env(safe-area-inset-left)); }
+.photo-viewer-next { right: max(10px, env(safe-area-inset-right)); }
+.photo-viewer-feedback { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px 68px; font-size: 1rem; }
+.photo-viewer-feedback button { min-height: 44px; border-radius: 12px; padding: 10px 18px; background: var(--lavender); color: var(--ink); font-weight: 700; }
+.photo-viewer-loading { position: absolute; inset: 0; pointer-events: none; }
 .detail-body { order: 3; padding: 0 28px 28px; }
 .detail-essentials { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0; margin: 0; list-style: none; }
 .detail-amenity { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; min-width: 0; min-height: 118px; padding: 18px 12px; background: var(--lavender); border-radius: 22px; text-align: center; }

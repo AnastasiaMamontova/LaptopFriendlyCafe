@@ -5,6 +5,10 @@ search by name, district or address, filters for Wi-Fi, outlets, quiet spaces,
 district and rating, photos, and personal ratings from 1 to 5 in 0.1
 increments. Add and edit cafes directly from your phone.
 
+Tap the main photo or a thumbnail in a cafe's details to view it full screen.
+Browse with swipes, on-screen arrows or the keyboard arrow keys. Close the viewer
+with the close button or Escape to return to the same cafe and selected photo.
+
 The app has no sign-in or roles. Browsing, adding, editing and deleting are open
 to everyone, as agreed for this version. The entire interface is in English.
 

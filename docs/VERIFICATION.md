@@ -1,4 +1,28 @@
-# Android 1.0.5 verification
+# Full-screen photo viewer verification
+
+- Tapping the main cafe photo or a thumbnail opens the selected photo in a
+  full-viewport dialog. Images fit inside the screen without cropping.
+- Multiple photos support next/previous buttons, keyboard arrows and horizontal
+  touch swipes, with circular navigation and a photo counter. A single photo
+  does not show navigation arrows; cafes without photos have no enlargement button.
+- Short, vertical and multi-finger gestures do not change the selected photo.
+- Close/Escape dismisses only the viewer. The cafe remains open on the last
+  viewed photo, and keyboard focus returns to the image control that opened it.
+  Keyboard Tab navigation stays within the viewer while it is open.
+- Loading and failed images have English status feedback; a failed photo can be
+  retried or skipped. Browsing photos never writes to the backend.
+- All 68 Playwright tests passed across mobile and desktop, including actual
+  browser touch input, keyboard/focus behavior, one/many/missing/failed photos,
+  catalog/map, CRUD, weekday hours and offline cache. Backend requests were mocked.
+- TypeScript and the production web/PWA build passed. Production viewing was
+  checked at 320, 390 and 1440 px widths without overflow or runtime errors:
+  [mobile](screenshots/photo-viewer-mobile.png),
+  [desktop](screenshots/photo-viewer-desktop.png). Screenshots use illustrative
+  fixture data and local photos; production records were unchanged.
+- No APK was built. The versioned Android 1.0.5 APK is unchanged and does not
+  include this new viewer until the next requested Android build.
+
+## Android 1.0.5 verification
 
 The current APK includes the agreed catalog, detail, icon and weekday-hours
 changes. Static Cafe / Cafes labels now use plain spelling; the collection title
