@@ -1,4 +1,4 @@
-# Café Berlin
+# Cafe Berlin
 
 A mobile-first collection of laptop-friendly cafes in Berlin: list and map views,
 search by name, district or address, filters for Wi-Fi, outlets, quiet spaces,

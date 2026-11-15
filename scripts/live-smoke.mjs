@@ -46,7 +46,7 @@ try {
   const image = detail.locator('.detail-hero > img')
   await image.waitFor()
   await page.waitForFunction(() => { const img = document.querySelector('.detail-hero > img'); return img instanceof HTMLImageElement && img.naturalWidth > 0 })
-  await detail.getByRole('button', { name: 'Edit café', exact: true }).click()
+  await detail.getByRole('button', { name: 'Edit cafe', exact: true }).click()
   await page.getByLabel('About this place').fill('Edited and persisted successfully.')
   const edit = page.waitForResponse(r => r.url().includes('/rest/v1/cafes') && r.request().method() === 'PATCH')
   await page.getByRole('button', { name: 'Save changes' }).click()

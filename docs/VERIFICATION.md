@@ -1,6 +1,20 @@
-# Catalog heading, filters and footer verification
+# Android 1.0.5 verification
 
-- The list heading is now “Laptop-friendly cafés”. The cafe count stays with
+The current APK includes the agreed catalog, detail, icon and weekday-hours
+changes. Static Cafe / Cafes labels now use plain spelling; the collection title
+reads “Laptop-friendly cafes”, the hours hint reads “Berlin time”, and catalog
+laptop filters/badges and install controls are removed.
+
+All 62 mobile/desktop tests, TypeScript, production web/PWA build, Android build,
+Android lint, signature verification and comparison of all 23 bundled web files
+pass. The certificate matches Android 1.0.4. The production UI was also checked
+at widths of 320, 390 and 1440 px. See
+[release verification](ANDROID_RELEASE_1.0.5.md) for details and the checksum.
+The APK is excluded from Git. Physical-device testing was not performed.
+
+## Catalog heading, filters and footer verification
+
+- The list heading is now “Laptop-friendly cafes”. The cafe count stays with
   the last word when the heading wraps on mobile.
 - Removed the laptop quick filter, its checkbox in the filter dialog, and its
   filtering condition. Catalog cards and map previews no longer repeat laptop
@@ -15,7 +29,8 @@
   [top](screenshots/catalog-top-mobile.png) and
   [bottom](screenshots/catalog-bottom-mobile.png). Widths of 320, 390 and 1440 px
   were checked without horizontal overflow or browser runtime errors.
-- No APK was built. The existing versioned Android 1.0.4 APK remains unchanged.
+- No APK was built during the initial catalog change. These updates are now
+  included in Android 1.0.5; the versioned Android 1.0.4 APK remains unchanged.
 
 ## Weekday hours editor verification
 
@@ -31,8 +46,8 @@
 - [Mobile screenshot](screenshots/opening-hours-mobile.png) and
   [opening-hours field](screenshots/weekday-hours-field.png) use illustrative
   fixture data. No production records were changed.
-- No APK was built for this change. The existing versioned 1.0.4 APK is unchanged
-  and does not include this editor simplification.
+- No APK was built during the initial editor change. The weekday editor and
+  shortened Berlin time hint are now included in Android 1.0.5.
 
 ## Android 1.0.4 verification
 

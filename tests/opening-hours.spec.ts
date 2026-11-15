@@ -67,7 +67,7 @@ async function backend(page: Page, hours = '') {
 
 async function edit(page: Page) {
   await page.getByRole('button', { name: 'Open Schedule Cafe', exact: true }).click()
-  await page.getByRole('button', { name: 'Edit café', exact: true }).click()
+  await page.getByRole('button', { name: 'Edit cafe', exact: true }).click()
 }
 
 async function time(page: Page, label: string, value: string) {
@@ -85,6 +85,7 @@ test('one weekday time range saves for Monday–Friday and remains editable afte
   await page.getByLabel('Address', { exact: false }).fill('Teststraße 2')
   await page.getByLabel('Latitude', { exact: true }).fill('52.51')
   const editor = page.locator('.hours-editor')
+  await expect(editor.locator('#hours-hint')).toHaveText('Berlin time')
   await expect(editor.getByText('Monday–Friday', { exact: true })).toBeVisible()
   await expect(editor.getByRole('combobox')).toHaveCount(4)
   await expect(editor.getByRole('button')).toHaveCount(0)
@@ -97,7 +98,7 @@ test('one weekday time range saves for Monday–Friday and remains editable afte
   await page.reload()
   await page.getByRole('button', { name: 'Open Weekday Cafe', exact: true }).click()
   await expect(page.getByRole('region', { name: 'Opening hours schedule' })).toHaveText('Mon–Fri 08:00–17:00')
-  await page.getByRole('button', { name: 'Edit café', exact: true }).click()
+  await page.getByRole('button', { name: 'Edit cafe', exact: true }).click()
   await expect(page.getByLabel('Weekdays opens hour')).toHaveValue('08')
   await expect(page.getByLabel('Weekdays closes hour')).toHaveValue('17')
   await time(page, 'Weekdays closes', '17:43')

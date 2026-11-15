@@ -9,7 +9,7 @@ export default defineConfig({
     registerType: 'prompt',
     includeAssets: ['icon.png', 'icons/*.png', 'demo/*.jpg'],
     manifest: {
-      name: 'Café Berlin', short_name: 'Café Berlin',
+      name: 'Cafe Berlin', short_name: 'Cafe Berlin',
       description: 'Your collection of laptop-friendly Berlin cafes',
       lang: 'en', start_url: '/', scope: '/', display: 'standalone',
       background_color: '#fffaf7', theme_color: '#fffaf7',
