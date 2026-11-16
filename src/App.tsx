@@ -2,6 +2,8 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type
 import { ArrowLeft, ArrowUpRight, Check, Coffee, ExternalLink, Grid2X2, Headphones, Laptop, LoaderCircle, Map, MapPin, Maximize2, Navigation, Pencil, Plus, RefreshCw, Search, SlidersHorizontal, Sparkles, Star, Wifi, WifiOff, X, Zap, Clock3 } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import { Capacitor } from '@capacitor/core'
+import { App as NativeApp } from '@capacitor/app'
+import { useAndroidBackButton, useBackHandler } from './lib/back-navigation'
 import type { Cafe } from './types/cafe'
 import { listCafes, deleteCafe } from './lib/cafes'
 import { demoCafes } from './lib/demo'
@@ -104,6 +106,9 @@ export default function App() {
   const cancelDeleteRef = useRef<HTMLButtonElement | null>(null)
   const deleteButtonRef = useRef<HTMLButtonElement | null>(null)
   const [busy, setBusy] = useState(false)
+  const [exitOpen, setExitOpen] = useState(false)
+  const [exiting, setExiting] = useState(false)
+  const stayRef = useRef<HTMLButtonElement | null>(null)
   const [toast, setToast] = useState('')
   const [updateReady, setUpdateReady] = useState(false)
   const [updateSW, setUpdateSW] = useState<((reloadPage?: boolean) => Promise<void>) | null>(null)
@@ -133,6 +138,19 @@ export default function App() {
   const visible = useMemo(() => filterCafes(source, query, filters, sort), [source, query, filters, sort])
   const districts = [...new Set(source.map(c => c.district))].sort()
   const filterCount = Number(filters.wifi)+Number(filters.sockets)+Number(filters.quiet)+Number(Boolean(filters.district))+Number(filters.minRating>1)
+  useAndroidBackButton()
+  useBackHandler(() => {
+    if (view === 'map') { setView('list'); window.scrollTo(0, 0) }
+    else if (query) setQuery('')
+    else if (demo) { setDemo(false); reset() }
+    else setExitOpen(true)
+  }, { priority: 0 })
+  async function exitApp() {
+    if (exiting) return
+    setExiting(true)
+    try { await NativeApp.exitApp() }
+    catch { setExiting(false); setToast('Could not close the app. Please try again.') }
+  }
   function newCafe() { setDemo(false); setSelected(null); setEditor('new') }
   function reset() { setFilters(emptyFilters); setQuery('') }
   async function remove() {
@@ -174,14 +192,17 @@ export default function App() {
       </main>
     </div>
     <nav className="mobile-nav" aria-label="Mobile navigation"><button className={view==='list' ? 'active' : ''} onClick={() => { setView('list'); window.scrollTo(0, 0) }}><Grid2X2 size={21} /><span>Places</span></button><button className="mobile-add" aria-label="Add cafe" onClick={newCafe} disabled={offline}><Plus size={24} /></button><button className={view==='map' ? 'active' : ''} onClick={() => { setView('map'); window.scrollTo(0, 0) }}><Map size={21} /><span>Map</span></button></nav>
-    {selected && !editor && <CafeDetails key={selected.id} cafe={selected} demo={demo} onClose={() => { if (deleting) { if (!busy) setDeleting(null) } else setSelected(null) }} onEdit={() => { setEditor(selected); setSelected(null) }} onDelete={button => { deleteButtonRef.current = button; setDeleting(selected) }} />}
-    {editor && <CafeEditor cafe={editor === 'new' ? undefined : editor} onClose={() => setEditor(null)} onSaved={saved => { cache([saved, ...cafes.filter(c => c.id !== saved.id)]); setEditor(null); setToast('Cafe saved'); setCached(false); setError('') }} />}
+    {selected && !editor && <CafeDetails key={selected.id} cafe={selected} demo={demo} onClose={() => { if (deleting) { if (!busy) setDeleting(null) } else setSelected(null) }} onEdit={() => setEditor(selected)} onDelete={button => { deleteButtonRef.current = button; setDeleting(selected) }} />}
+    {editor && <CafeEditor cafe={editor === 'new' ? undefined : editor} onClose={() => setEditor(null)} onSaved={saved => { cache([saved, ...cafes.filter(c => c.id !== saved.id)]); setEditor(null); setSelected(null); setToast('Cafe saved'); setCached(false); setError('') }} />}
     <Modal open={filterOpen} onOpenChange={setFilterOpen} title="Find your place" description="Choose what matters for a good workday." className="filter-modal"><div className="filter-form"><fieldset className="filter-districts"><legend>District</legend><div role="group" aria-label="District"><button type="button" aria-pressed={!filters.district} onClick={() => setFilters(f => ({ ...f, district: '' }))}>All Berlin districts</button>{districts.map(d => <button type="button" key={d} aria-pressed={filters.district === d} onClick={() => setFilters(f => ({ ...f, district: d }))}>{d}</button>)}</div></fieldset><div className="field"><label htmlFor="filter-rating">Minimum rating: {formatRating(filters.minRating)}</label><input id="filter-rating" type="range" min="1" max="5" step="0.1" value={filters.minRating} onChange={e => setFilters(f => ({ ...f, minRating: Number(e.target.value) }))} /></div><div className="filter-options">{([['wifi','Wi-Fi','Stay connected',Wifi],['sockets','Outlets','Keep your battery topped up',Zap],['quiet','Quiet atmosphere','Find your focus',Headphones]] as const).map(([key,label,hint,Icon]) => <button type="button" key={key} aria-pressed={filters[key]} onClick={() => setFilters(f => ({ ...f, [key]: !f[key] }))}><Icon size={20} aria-hidden="true" /><span>{label}<small>{hint}</small></span></button>)}</div><div className="form-actions"><Button variant="outline" onClick={() => setFilters(emptyFilters)}>Reset</Button><Button onClick={() => setFilterOpen(false)}>Show {visible.length} {placeWord(visible.length)}</Button></div></div></Modal>
     <Modal open={Boolean(deleting)} onOpenChange={o => !busy && !o && setDeleting(null)} role="alertdialog" className="delete-modal" overlayClassName="delete-overlay" initialFocusRef={cancelDeleteRef} closeDisabled={busy} onCloseAutoFocus={event => {
       event.preventDefault()
       const target = deleteButtonRef.current?.isConnected ? deleteButtonRef.current : document.querySelector<HTMLButtonElement>('.mobile-add')
       target?.focus({ preventScroll: true })
     }} title="Delete this cafe?" description={`Are you sure you want to delete “${deleting?.name || ''}” and all its photos?`}><div className="confirm-body"><p>This action cannot be undone.</p><div className="form-actions"><button ref={cancelDeleteRef} className="button button-outline" onClick={() => setDeleting(null)} disabled={busy}>Cancel</button><Button variant="destructive" onClick={remove} disabled={busy}>{busy && <LoaderCircle className="spin" size={16} />}{busy ? 'Deleting…' : 'Delete cafe'}</Button></div></div></Modal>
+    <Modal open={exitOpen} onOpenChange={open => { if (!exiting) setExitOpen(open) }} role="alertdialog" className="delete-modal exit-modal" overlayClassName="delete-overlay" initialFocusRef={stayRef} closeDisabled={exiting} onCloseAutoFocus={event => { event.preventDefault(); document.querySelector<HTMLButtonElement>('.mobile-add')?.focus({ preventScroll: true }) }} title="Exit app?" description="Are you sure you want to close Cafe Berlin?">
+      <div className="confirm-body"><div className="form-actions"><button ref={stayRef} className="button button-outline" onClick={() => setExitOpen(false)} disabled={exiting}>Stay</button><Button onClick={exitApp} disabled={exiting}>{exiting ? 'Closing…' : 'Exit app'}</Button></div></div>
+    </Modal>
     {toast && <div className="toast" role="status"><Check size={18} /><span>{toast}</span><button aria-label="Dismiss notification" onClick={() => setToast('')}><X size={16} /></button></div>}
   </div>
 }

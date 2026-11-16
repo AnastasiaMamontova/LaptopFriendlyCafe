@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { LoaderCircle, MapPin, Search, X } from 'lucide-react'
 import { searchBerlinAddresses, type BerlinAddress } from '../lib/address-search'
+import { useBackHandler } from '../lib/back-navigation'
 
 export default function AddressSearch({ onSelect, onClear }: { onSelect: (address: BerlinAddress) => void; onClear: () => void }) {
   const id = useId()
@@ -46,6 +47,7 @@ export default function AddressSearch({ onSelect, onClear }: { onSelect: (addres
     setQuery(''); setSelectedQuery(''); setOpen(false); setAddresses([]); onClear(); input.current?.focus()
   }
   const expanded = open && query.trim().length >= 3 && query !== selectedQuery
+  useBackHandler(() => { setOpen(false); setActive(-1); input.current?.blur() }, { enabled: expanded, priority: 50 })
   return <div className="address-search" onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false) }}>
     <label htmlFor={`${id}-input`}>Find an address in Berlin</label>
     <div className="address-input-wrap"><Search size={18} /><input ref={input} id={`${id}-input`} role="combobox" type="text" autoComplete="off" spellCheck={false} maxLength={240} aria-autocomplete="list" aria-expanded={expanded} aria-controls={expanded ? `${id}-list` : undefined} aria-activedescendant={expanded && active >= 0 ? `${id}-option-${active}` : undefined} aria-describedby={`${id}-hint`} placeholder="Street and number…" value={query} onFocus={() => setOpen(true)} onChange={event => { setQuery(event.target.value); setSelectedQuery(''); setOpen(true); setActive(-1); onClear() }} onKeyDown={event => {

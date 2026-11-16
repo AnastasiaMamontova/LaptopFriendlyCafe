@@ -17,6 +17,10 @@ with the close button or Escape to return to the same cafe and selected photo.
 Cafe details use compact information rows for amenities. Deleting a cafe opens
 an English confirmation dialog; Cancel keeps the cafe and its photos unchanged.
 
+Android system Back closes the current popup or screen before returning to the
+collection. At the home collection it asks before exiting. See
+[Android navigation](docs/ANDROID_NAVIGATION.md) for the behavior and validation.
+
 The app has no sign-in or roles. Browsing, adding, editing and deleting are open
 to everyone, as agreed for this version. The entire interface is in English.
 

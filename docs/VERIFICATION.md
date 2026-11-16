@@ -1,4 +1,17 @@
-# Android 1.0.6 verification
+# Android system Back verification
+
+Added internal navigation for the Android system Back button/gesture via the
+official App plugin: photos, dialogs, editor and map return within the app;
+the home collection asks for explicit exit confirmation. Pending saves/deletions
+consume Back without navigating away. The web browser's Back remains unchanged.
+
+All 84 mobile/desktop tests and the production web/PWA build pass, including
+Android bridge simulation and explicit exit checks. Capacitor plugin sync,
+native Java compilation and Android lint also pass without producing an APK. See
+[navigation details](ANDROID_NAVIGATION.md). The installed 1.0.6 APK remains
+unchanged; a new Android build is required to ship this behavior.
+
+## Android 1.0.6 verification
 
 The current APK includes all UI changes: home sections and search suggestions,
 full-screen photos, compact cafe details without the cat emblem, weekday hours

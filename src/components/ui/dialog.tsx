@@ -1,6 +1,7 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import type { ReactNode, RefObject } from 'react'
+import { useBackHandler } from '../../lib/back-navigation'
 
 interface ModalProps {
   open: boolean
@@ -20,6 +21,7 @@ interface ModalProps {
 }
 
 export function Modal({ open, onOpenChange, title, description, children, className = '', overlayClassName = '', closeIcon, headingContent, role = 'dialog', initialFocusRef, onCloseAutoFocus, onEscapeKeyDown, closeDisabled = false }: ModalProps) {
+  useBackHandler(() => { if (!closeDisabled) onOpenChange(false) }, { enabled: open })
   return <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}><DialogPrimitive.Portal>
     <DialogPrimitive.Overlay className={`modal-overlay ${overlayClassName}`} />
     <DialogPrimitive.Content className={`modal ${className}`} role={role} onCloseAutoFocus={onCloseAutoFocus} onEscapeKeyDown={onEscapeKeyDown} onOpenAutoFocus={event => { if (initialFocusRef?.current) { event.preventDefault(); initialFocusRef.current.focus() } }}>

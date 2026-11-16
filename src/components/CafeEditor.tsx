@@ -64,7 +64,7 @@ export default function CafeEditor({ cafe, onClose, onSaved }: { cafe?: Cafe; on
       setError(e instanceof Error ? e.message : 'Could not save the cafe. Please try again.')
     } finally { setSaving(false) }
   }
-  return <Modal open onOpenChange={open => !open && close()} title={cafe ? 'Edit cafe' : 'New place'} description="Save a place you will want to come back to." className="editor-modal">
+  return <Modal open onOpenChange={open => !open && close()} closeDisabled={saving} title={cafe ? 'Edit cafe' : 'New place'} description="Save a place you will want to come back to." className="editor-modal">
     <form onSubmit={submit} className="editor-form">
       <fieldset disabled={saving} className="form-fields">
       <div className="field"><label htmlFor="cafe-name">Name <span>*</span></label><input id="cafe-name" required maxLength={120} placeholder="What is the cafe called?" value={form.name} onChange={e => update('name', e.target.value)} /></div>

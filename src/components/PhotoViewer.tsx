@@ -1,6 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { ChevronLeft, ChevronRight, ImageOff, LoaderCircle, X } from 'lucide-react'
 import { useRef, useState, type RefObject, type TouchEvent } from 'react'
+import { useBackHandler } from '../lib/back-navigation'
 
 function PhotoSlide({ src, alt }: { src: string; alt: string }) {
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading')
@@ -24,6 +25,7 @@ export default function PhotoViewer({ open, onOpenChange, photos, cafeName, inde
   returnFocusRef: RefObject<HTMLButtonElement | null>
 }) {
   const touchStart = useRef<{ x: number; y: number } | null>(null)
+  useBackHandler(() => onOpenChange(false), { enabled: open && photos.length > 0, priority: 200 })
   const multiple = photos.length > 1
   function move(direction: number) { onIndexChange((index + direction + photos.length) % photos.length) }
   function startSwipe(event: TouchEvent) {

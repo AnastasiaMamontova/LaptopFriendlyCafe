@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { Search, X } from 'lucide-react'
 import type { Cafe } from '../types/cafe'
+import { useBackHandler } from '../lib/back-navigation'
 
 export default function CafeSearch({ query, onChange, cafes, onSelect }: {
   query: string; onChange: (query: string) => void; cafes: Cafe[]; onSelect: (cafe: Cafe) => void
@@ -14,6 +15,7 @@ export default function CafeSearch({ query, onChange, cafes, onSelect }: {
   const options = cafes.slice(0, 6)
   const expanded = open && Boolean(query.trim())
   const activeIndex = active < options.length ? active : -1
+  useBackHandler(() => { setOpen(false); setActive(-1); input.current?.blur() }, { enabled: expanded, priority: 50 })
   useEffect(() => {
     // Collapse the in-flow suggestions after an outside click, so the target
     // does not move between pointer-down (input blur) and pointer-up.
