@@ -1,4 +1,23 @@
-# Home-page sections and search verification
+# Compact cafe details and delete confirmation
+
+Implemented the approved compact reference: shorter photo, overlapping thumbnails,
+district/rating on one line and plain icon/text amenities without large tiles or
+the cat emblem. Typical short content fits at 390×844; the 320×740 example needs
+about 42 px of scrolling. Long saved text remains available in full.
+
+Delete opens a separate centered English alert dialog with Cancel and Delete
+cafe. Cancel receives initial focus and returns to the same cafe and photo;
+deletion happens only after confirmation. Pending deletion blocks repeat actions,
+and failures can be retried or cancelled. A fast Escape in the nested photo
+viewer dismisses the viewer before the parent card.
+
+All 76 mobile/desktop tests and the production web/PWA build pass. Production
+screens were checked at 320, 390 and 1440 px without horizontal overflow or
+runtime errors. See [details and screenshots](CAFE_DETAILS.md). Tests use mocked
+backend requests and screenshots use illustrative data; production records are
+unchanged. No APK was built.
+
+## Home-page sections and search verification
 
 Implemented the approved four-section design with compact rows, a lavender
 toggle-filter panel and map preview. The visible app heading and filter

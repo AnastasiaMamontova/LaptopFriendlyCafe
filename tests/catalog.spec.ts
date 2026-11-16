@@ -77,7 +77,7 @@ async function setRange(page: Page, selector: string, value: string) {
   }, value)
 }
 
-test('cafe details preserve amenities, complete hours, gallery and editing in the large-text layout', async ({ page }) => {
+test('cafe details preserve amenities, complete hours, gallery and editing in the compact layout', async ({ page }) => {
   const photos = ['one', 'two'].map(name => `https://ui-test.supabase.co/storage/v1/object/public/cafe-photos/${name}.jpg`)
   await mockBackend(page, [fixture(initialCafes[0].id, 'Detail Cafe', 'Mitte', 4.7, {
     wifi: false, laptop_friendly: false, noise: 'lively', photos,
@@ -91,9 +91,9 @@ test('cafe details preserve amenities, complete hours, gallery and editing in th
   await expect(amenities.getByText('No / not confirmed', { exact: true })).toHaveCount(2)
   await expect(amenities).toContainText('Lively')
   await expect(amenities.getByText('Quiet', { exact: true })).toHaveCount(0)
-  await expect(dialog.locator('.detail-rating')).toHaveText('4.7Your rating')
+  await expect(dialog.locator('.detail-rating')).toHaveText('4.7· Your rating')
   await expect(dialog.getByRole('heading', { name: 'About this cafe' })).toBeVisible()
-  await expect(dialog.locator('.detail-description')).toHaveCSS('font-size', '20px')
+  await expect(dialog.locator('.detail-description')).toHaveCSS('font-size', '16px')
   const hours = dialog.getByRole('region', { name: 'Opening hours schedule' })
   await expect(hours).toHaveText('Mon–Fri 09:00–18:00 · Sat 10:00–16:00 · Sun Closed')
   await expect(hours).toHaveCSS('white-space', 'nowrap')
@@ -113,6 +113,72 @@ test('cafe details preserve amenities, complete hours, gallery and editing in th
   await expect(page.locator('.hours-saved-note')).toContainText('Sun Closed')
   await expect(page.locator('.hours-editor').getByRole('combobox')).toHaveCount(4)
   await expect(page.getByRole('button', { name: /Remove photo/ })).toHaveCount(2)
+})
+
+test('deletion asks in English, defaults to Cancel and preserves the cafe and selected photo', async ({ page }) => {
+  const photos = ['one', 'two'].map(name => `https://ui-test.supabase.co/storage/v1/object/public/cafe-photos/${name}.jpg`)
+  const backend = await mockBackend(page, [fixture(initialCafes[0].id, 'Confirm Cafe', 'Mitte', 4.7, { photos })])
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Open Confirm Cafe', exact: true }).click()
+  await page.getByRole('button', { name: 'Show photo 2', exact: true }).click()
+  await page.getByRole('button', { name: 'Close photos', exact: true }).click()
+  await expect(page.locator('.detail-mascot')).toHaveCount(0)
+  const remove = page.getByRole('button', { name: 'Delete', exact: true })
+  await remove.click()
+  const confirmation = page.getByRole('alertdialog', { name: 'Delete this cafe?', exact: true })
+  await expect(confirmation).toContainText('Are you sure you want to delete “Confirm Cafe” and all its photos?')
+  await expect(confirmation.getByRole('button', { name: 'Cancel', exact: true })).toBeFocused()
+  expect(backend.writes).toHaveLength(0)
+  expect(backend.photoDeletes).toBe(0)
+  await page.keyboard.press('Enter')
+  await expect(confirmation).toHaveCount(0)
+  await expect(remove).toBeFocused()
+  await expect(page.locator('.detail-photo>img')).toHaveAttribute('src', photos[1])
+  await remove.click()
+  await page.keyboard.press('Escape')
+  await expect(confirmation).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Confirm Cafe', exact: true })).toBeVisible()
+  await expect(remove).toBeFocused()
+  expect(backend.writes).toHaveLength(0)
+  expect(backend.photoDeletes).toBe(0)
+})
+
+test('failed deletion remains recoverable and confirmed deletion cannot be repeated while pending', async ({ page }) => {
+  const photo = 'https://ui-test.supabase.co/storage/v1/object/public/cafe-photos/one.jpg'
+  const backend = await mockBackend(page, [fixture(initialCafes[0].id, 'Retry Cafe', 'Mitte', 4.7, { photos: [photo] })])
+  const endpoint = 'https://**.supabase.co/rest/v1/cafes**'
+  await page.route(endpoint, route => route.request().method() === 'DELETE' ? route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'Temporary failure' }) }) : route.fallback())
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Open Retry Cafe', exact: true }).click()
+  await page.getByRole('button', { name: 'Delete', exact: true }).click()
+  const confirmation = page.getByRole('alertdialog', { name: 'Delete this cafe?', exact: true })
+  await confirmation.getByRole('button', { name: 'Delete cafe', exact: true }).click()
+  await expect(page.getByText('Could not delete the cafe. Please try again.', { exact: true })).toBeVisible()
+  await expect(confirmation.getByRole('button', { name: 'Delete cafe', exact: true })).toBeEnabled()
+  expect(backend.cafes).toHaveLength(1)
+  expect(backend.photoDeletes).toBe(0)
+  await confirmation.getByRole('button', { name: 'Cancel', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Retry Cafe', exact: true })).toBeVisible()
+  await page.unroute(endpoint)
+  let release!: () => void
+  const pending = new Promise<void>(resolve => { release = resolve })
+  await page.route(endpoint, async route => {
+    if (route.request().method() === 'DELETE') await pending
+    await route.fallback()
+  })
+  try {
+    await page.getByRole('button', { name: 'Delete', exact: true }).click()
+    await confirmation.getByRole('button', { name: 'Delete cafe', exact: true }).click()
+    await expect(confirmation.getByRole('button', { name: 'Deleting…', exact: true })).toBeDisabled()
+    await expect(confirmation.getByRole('button', { name: 'Cancel', exact: true })).toBeDisabled()
+    await expect(confirmation.getByRole('button', { name: 'Close', exact: true })).toBeDisabled()
+    await page.keyboard.press('Escape')
+    await expect(confirmation).toBeVisible()
+  } finally { release() }
+  await expect(confirmation).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Your first cafe awaits', exact: true })).toBeVisible()
+  expect(backend.writes.filter(write => write.method === 'DELETE')).toHaveLength(1)
+  expect(backend.photoDeletes).toBe(1)
 })
 
 test('full-screen photos wrap, support keyboard navigation, and restore the detail view and focus', async ({ page }) => {
@@ -297,9 +363,9 @@ for (const mode of ['search, filters and sorting', 'map and card', 'create edit 
       expect(backend.photoDeletes).toBeGreaterThan(0)
       await page.getByRole('button', { name: 'Open Delta Updated', exact: true }).click()
       await page.getByRole('button', { name: 'Delete', exact: true }).click()
-      await page.getByRole('button', { name: 'Keep cafe', exact: true }).click()
+      await page.getByRole('alertdialog').getByRole('button', { name: 'Cancel', exact: true }).click()
       expect(backend.cafes).toHaveLength(4)
-      await page.getByRole('button', { name: 'Open Delta Updated', exact: true }).click()
+      await expect(page.getByRole('dialog').getByRole('heading', { name: 'Delta Updated', exact: true })).toBeVisible()
       await page.getByRole('button', { name: 'Delete', exact: true }).click()
       await page.getByRole('button', { name: 'Delete cafe', exact: true }).click()
       await expect(page.locator('.cafe-card')).toHaveCount(3)

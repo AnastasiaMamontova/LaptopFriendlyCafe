@@ -14,6 +14,8 @@ address search. See [home-page layout](docs/HOME_LAYOUT.md).
 Tap the main photo or a thumbnail in a cafe's details to view it full screen.
 Browse with swipes, on-screen arrows or the keyboard arrow keys. Close the viewer
 with the close button or Escape to return to the same cafe and selected photo.
+Cafe details use compact information rows for amenities. Deleting a cafe opens
+an English confirmation dialog; Cancel keeps the cafe and its photos unchanged.
 
 The app has no sign-in or roles. Browsing, adding, editing and deleting are open
 to everyone, as agreed for this version. The entire interface is in English.

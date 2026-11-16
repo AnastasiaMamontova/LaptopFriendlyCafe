@@ -18,15 +18,16 @@ Generated outputs:
 
 - `public/icon.png`: 64 px browser favicon.
 - `public/icons/cappuccino-cat-192.png` and `cappuccino-cat-512.png`: PWA icons;
-  the 192 px variant also appears in the cafe detail card and Apple touch icon.
+  the 192 px variant is also the Apple touch icon. The compact cafe detail page
+  intentionally has no cat emblem.
 - `public/icons/cappuccino-cat-maskable-512.png`: padded maskable PWA icon.
 - Android launcher, round and adaptive foreground PNGs in all five density
   folders under `android/app/src/main/res/mipmap-*`.
 - Android splash images at their existing dimensions under `drawable*`.
 
 PWA icon paths include the artwork name so installed clients can distinguish them
-from the previous icons. The manifest, favicon, touch icon and in-app image all
-reference the new assets. Generated browser assets are precached for offline use.
+from the previous icons. The manifest, favicon and touch icon reference the new
+assets. Generated browser assets are precached for offline use.
 The full-resolution master stays outside `public/` and is not shipped to clients.
 
 The Android build script regenerates these same assets before compiling the web

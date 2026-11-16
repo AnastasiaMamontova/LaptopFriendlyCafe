@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
-import { ArrowLeft, ArrowUpRight, Check, Coffee, ExternalLink, Grid2X2, Headphones, Laptop, LoaderCircle, Map, MapPin, Maximize2, Navigation, Pencil, Plus, RefreshCw, Search, SlidersHorizontal, Sparkles, Star, Trash2, Wifi, WifiOff, X, Zap, Clock3 } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Check, Coffee, ExternalLink, Grid2X2, Headphones, Laptop, LoaderCircle, Map, MapPin, Maximize2, Navigation, Pencil, Plus, RefreshCw, Search, SlidersHorizontal, Sparkles, Star, Wifi, WifiOff, X, Zap, Clock3 } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import { Capacitor } from '@capacitor/core'
 import type { Cafe } from './types/cafe'
@@ -12,7 +12,6 @@ import CafeEditor from './components/CafeEditor'
 import CafeSearch from './components/CafeSearch'
 import OpeningHours from './components/OpeningHours'
 import PhotoViewer from './components/PhotoViewer'
-import { CatMark } from './components/BrandArt'
 const CafeMap = lazy(() => import('./components/CafeMap'))
 const CACHE_KEY = 'cafe-berlin-catalog-v1'
 function readCache(): Cafe[] | null {
@@ -35,13 +34,15 @@ function CafeCard({ cafe, onClick }: { cafe: Cafe; onClick: () => void }) {
   </button>
 }
 
-function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; demo: boolean; onClose: () => void; onEdit: () => void; onDelete: () => void }) {
+function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; demo: boolean; onClose: () => void; onEdit: () => void; onDelete: (button: HTMLButtonElement) => void }) {
   const [photo, setPhoto] = useState(0)
   const [viewerOpen, setViewerOpen] = useState(false)
+  const viewerOpenRef = useRef(false)
   const photoTrigger = useRef<HTMLButtonElement | null>(null)
+  function changeViewerOpen(open: boolean) { viewerOpenRef.current = open; setViewerOpen(open) }
   function showPhoto(index: number, event: MouseEvent<HTMLButtonElement>) {
     photoTrigger.current = event.currentTarget
-    setPhoto(index); setViewerOpen(true)
+    setPhoto(index); changeViewerOpen(true)
   }
   const mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${cafe.lat},${cafe.lng}`
   const amenities = [
@@ -50,8 +51,12 @@ function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; de
     { label: cafe.noise === 'quiet' ? 'Quiet' : 'Atmosphere', icon: Headphones, available: true, detail: cafe.noise === 'quiet' ? '' : noiseLabels[cafe.noise] },
     { label: 'Laptops welcome', icon: Laptop, available: cafe.laptop_friendly },
   ]
-  return <Modal open onOpenChange={o => !o && onClose()} title={cafe.name} description={cafe.district} className="detail-modal" closeIcon={<ArrowLeft size={28} />} headingContent={
-    <div className="detail-rating"><Star size={27} fill="currentColor" aria-hidden="true" /><strong>{formatRating(cafe.rating)}</strong><span>Your rating</span></div>
+  return <Modal open onOpenChange={o => !o && onClose()} onEscapeKeyDown={event => {
+    // A fast Escape must dismiss the photo viewer before its parent card, even
+    // while the nested dialog is registering its keyboard layer.
+    if (viewerOpenRef.current) { event.preventDefault(); changeViewerOpen(false) }
+  }} title={cafe.name} description={cafe.district} className="detail-modal" closeIcon={<ArrowLeft size={28} />} headingContent={
+    <div className="detail-rating"><Star size={20} fill="currentColor" aria-hidden="true" /><strong>{formatRating(cafe.rating)}</strong><span>· Your rating</span></div>
   }>
     <div className="detail-hero">
       {cafe.photos.length ? <button className="detail-photo" aria-label={`Enlarge photo ${photo + 1} of ${cafe.photos.length}`} onClick={event => showPhoto(photo, event)}>
@@ -59,26 +64,25 @@ function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; de
         <span className="detail-photo-expand" aria-hidden="true"><Maximize2 size={21} /></span>
       </button> : <Photo cafe={cafe} />}
       {!demo && <button className="detail-hero-edit" onClick={onEdit} aria-label="Edit cafe details"><Pencil size={25} /></button>}
-      <span className="detail-mascot"><CatMark /></span>
     </div>
     {cafe.photos.length > 1 && <div className="gallery-thumbs">{cafe.photos.map((url,i) => <button key={`${url}-${i}`} onClick={event => showPhoto(i, event)} aria-label={`Show photo ${i+1}`} aria-pressed={photo === i}><img src={url} alt="" /></button>)}</div>}
     <div className="detail-body">
       {demo && <div className="demo-notice"><Sparkles size={16} /> Sample card. Names and details are illustrative.</div>}
       <ul className="detail-essentials" aria-label="Work essentials">{amenities.map(({ label, icon: Icon, available, detail }) =>
         <li key={label} className={`detail-amenity${available ? '' : ' detail-amenity-unconfirmed'}`}>
-          <Icon size={36} aria-hidden="true" /><span>{label}</span>
+          <Icon size={28} aria-hidden="true" /><span>{label}</span>
           {(!available || detail) && <small>{available ? detail : 'No / not confirmed'}</small>}
         </li>
       )}</ul>
       <section className="detail-about"><h3>About this cafe</h3><p className="detail-description">{cafe.description || 'No description yet.'}</p></section>
       <div className="detail-facts">
-        <section><MapPin size={28} aria-hidden="true" /><div><h3>Address</h3><p>{cafe.address}</p></div></section>
-        <section><Clock3 size={28} aria-hidden="true" /><div><h3>Opening hours</h3><OpeningHours value={cafe.hours} /></div></section>
+        <section><MapPin size={23} aria-hidden="true" /><div><h3>Address</h3><p>{cafe.address}</p></div></section>
+        <section><Clock3 size={23} aria-hidden="true" /><div><h3>Opening hours</h3><OpeningHours value={cafe.hours} /></div></section>
       </div>
-      {!demo && <div className="detail-links"><Button asChild><a href={mapUrl} target="_blank" rel="noreferrer"><Navigation size={25} />Get directions</a></Button>{/^https?:\/\//i.test(cafe.website) && <Button variant="outline" asChild><a href={cafe.website} target="_blank" rel="noreferrer"><ExternalLink size={24} />Visit website</a></Button>}</div>}
-      {!demo && <div className="detail-edit"><Button variant="ghost" onClick={onEdit}>Edit cafe</Button><Button variant="ghost" className="text-danger" onClick={onDelete}><Trash2 size={18} />Delete</Button></div>}
+      {!demo && <div className="detail-links"><Button asChild><a href={mapUrl} target="_blank" rel="noreferrer"><Navigation size={22} />Get directions</a></Button>{/^https?:\/\//i.test(cafe.website) && <Button variant="outline" asChild><a href={cafe.website} target="_blank" rel="noreferrer"><ExternalLink size={21} />Visit website</a></Button>}</div>}
+      {!demo && <div className="detail-edit"><Button variant="ghost" onClick={onEdit}>Edit cafe</Button><span aria-hidden="true">·</span><Button variant="ghost" className="text-danger" onClick={event => onDelete(event.currentTarget)}>Delete</Button></div>}
     </div>
-    <PhotoViewer open={viewerOpen} onOpenChange={setViewerOpen} photos={cafe.photos} cafeName={cafe.name} index={photo} onIndexChange={setPhoto} returnFocusRef={photoTrigger} />
+    <PhotoViewer open={viewerOpen} onOpenChange={changeViewerOpen} photos={cafe.photos} cafeName={cafe.name} index={photo} onIndexChange={setPhoto} returnFocusRef={photoTrigger} />
   </Modal>
 }
 
@@ -97,6 +101,8 @@ export default function App() {
   const [selected, setSelected] = useState<Cafe | null>(null)
   const [editor, setEditor] = useState<Cafe | 'new' | null>(null)
   const [deleting, setDeleting] = useState<Cafe | null>(null)
+  const cancelDeleteRef = useRef<HTMLButtonElement | null>(null)
+  const deleteButtonRef = useRef<HTMLButtonElement | null>(null)
   const [busy, setBusy] = useState(false)
   const [toast, setToast] = useState('')
   const [updateReady, setUpdateReady] = useState(false)
@@ -130,7 +136,7 @@ export default function App() {
   function newCafe() { setDemo(false); setSelected(null); setEditor('new') }
   function reset() { setFilters(emptyFilters); setQuery('') }
   async function remove() {
-    if (!deleting) return; setBusy(true)
+    if (!deleting || busy) return; setBusy(true)
     try { await deleteCafe(deleting.id); cache(cafes.filter(c => c.id !== deleting.id)); setDeleting(null); setSelected(null); setToast('Cafe deleted') }
     catch (e) { setToast(e instanceof Error ? e.message : 'Could not delete the cafe') }
     finally { setBusy(false) }
@@ -168,10 +174,14 @@ export default function App() {
       </main>
     </div>
     <nav className="mobile-nav" aria-label="Mobile navigation"><button className={view==='list' ? 'active' : ''} onClick={() => { setView('list'); window.scrollTo(0, 0) }}><Grid2X2 size={21} /><span>Places</span></button><button className="mobile-add" aria-label="Add cafe" onClick={newCafe} disabled={offline}><Plus size={24} /></button><button className={view==='map' ? 'active' : ''} onClick={() => { setView('map'); window.scrollTo(0, 0) }}><Map size={21} /><span>Map</span></button></nav>
-    {selected && !editor && <CafeDetails key={selected.id} cafe={selected} demo={demo} onClose={() => setSelected(null)} onEdit={() => { setEditor(selected); setSelected(null) }} onDelete={() => { setDeleting(selected); setSelected(null) }} />}
+    {selected && !editor && <CafeDetails key={selected.id} cafe={selected} demo={demo} onClose={() => { if (deleting) { if (!busy) setDeleting(null) } else setSelected(null) }} onEdit={() => { setEditor(selected); setSelected(null) }} onDelete={button => { deleteButtonRef.current = button; setDeleting(selected) }} />}
     {editor && <CafeEditor cafe={editor === 'new' ? undefined : editor} onClose={() => setEditor(null)} onSaved={saved => { cache([saved, ...cafes.filter(c => c.id !== saved.id)]); setEditor(null); setToast('Cafe saved'); setCached(false); setError('') }} />}
     <Modal open={filterOpen} onOpenChange={setFilterOpen} title="Find your place" description="Choose what matters for a good workday." className="filter-modal"><div className="filter-form"><fieldset className="filter-districts"><legend>District</legend><div role="group" aria-label="District"><button type="button" aria-pressed={!filters.district} onClick={() => setFilters(f => ({ ...f, district: '' }))}>All Berlin districts</button>{districts.map(d => <button type="button" key={d} aria-pressed={filters.district === d} onClick={() => setFilters(f => ({ ...f, district: d }))}>{d}</button>)}</div></fieldset><div className="field"><label htmlFor="filter-rating">Minimum rating: {formatRating(filters.minRating)}</label><input id="filter-rating" type="range" min="1" max="5" step="0.1" value={filters.minRating} onChange={e => setFilters(f => ({ ...f, minRating: Number(e.target.value) }))} /></div><div className="filter-options">{([['wifi','Wi-Fi','Stay connected',Wifi],['sockets','Outlets','Keep your battery topped up',Zap],['quiet','Quiet atmosphere','Find your focus',Headphones]] as const).map(([key,label,hint,Icon]) => <button type="button" key={key} aria-pressed={filters[key]} onClick={() => setFilters(f => ({ ...f, [key]: !f[key] }))}><Icon size={20} aria-hidden="true" /><span>{label}<small>{hint}</small></span></button>)}</div><div className="form-actions"><Button variant="outline" onClick={() => setFilters(emptyFilters)}>Reset</Button><Button onClick={() => setFilterOpen(false)}>Show {visible.length} {placeWord(visible.length)}</Button></div></div></Modal>
-    <Modal open={Boolean(deleting)} onOpenChange={o => !busy && !o && setDeleting(null)} title="Delete this cafe?" description={`“${deleting?.name || ''}” and its photos will be removed from your collection.`}><div className="confirm-body"><p>This action cannot be undone.</p><div className="form-actions"><Button variant="outline" onClick={() => setDeleting(null)} disabled={busy}>Keep cafe</Button><Button variant="destructive" onClick={remove} disabled={busy}>{busy && <LoaderCircle className="spin" size={16} />}Delete cafe</Button></div></div></Modal>
+    <Modal open={Boolean(deleting)} onOpenChange={o => !busy && !o && setDeleting(null)} role="alertdialog" className="delete-modal" overlayClassName="delete-overlay" initialFocusRef={cancelDeleteRef} closeDisabled={busy} onCloseAutoFocus={event => {
+      event.preventDefault()
+      const target = deleteButtonRef.current?.isConnected ? deleteButtonRef.current : document.querySelector<HTMLButtonElement>('.mobile-add')
+      target?.focus({ preventScroll: true })
+    }} title="Delete this cafe?" description={`Are you sure you want to delete “${deleting?.name || ''}” and all its photos?`}><div className="confirm-body"><p>This action cannot be undone.</p><div className="form-actions"><button ref={cancelDeleteRef} className="button button-outline" onClick={() => setDeleting(null)} disabled={busy}>Cancel</button><Button variant="destructive" onClick={remove} disabled={busy}>{busy && <LoaderCircle className="spin" size={16} />}{busy ? 'Deleting…' : 'Delete cafe'}</Button></div></div></Modal>
     {toast && <div className="toast" role="status"><Check size={18} /><span>{toast}</span><button aria-label="Dismiss notification" onClick={() => setToast('')}><X size={16} /></button></div>}
   </div>
 }

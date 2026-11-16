@@ -22,7 +22,7 @@ The approved design is implemented as four separate rounded sections:
 
 There is no visible app title/banner above Search. A screen-reader-only page
 heading preserves document structure. Section headings use 20 px text, cafe names
-18 px and search input 16 px. The larger cafe-detail layout is retained.
+18 px and search input 16 px. Cafe details use their own compact layout.
 
 ## Search interaction
 
