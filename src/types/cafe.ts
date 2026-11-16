@@ -12,7 +12,7 @@ export interface Cafe {
   wifi: boolean
   sockets: boolean
   noise: NoiseLevel
-  laptop_friendly: boolean
+  good_tables: boolean
   hours: string
   website: string
   photos: string[]

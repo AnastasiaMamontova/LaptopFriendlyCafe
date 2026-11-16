@@ -1,7 +1,7 @@
 # Cafe Berlin
 
 A mobile-first collection of laptop-friendly cafes in Berlin: list and map views,
-search by name, district or address, filters for Wi-Fi, outlets, quiet spaces,
+search by name, district or address, filters for Wi-Fi, outlets, quiet spaces, good tables,
 district and rating, photos, and personal ratings from 1 to 5 in 0.1
 increments. Add and edit cafes directly from your phone.
 
@@ -16,6 +16,10 @@ Browse with swipes, on-screen arrows or the keyboard arrow keys. Close the viewe
 with the close button or Escape to return to the same cafe and selected photo.
 Cafe details use compact information rows for amenities. Deleting a cafe opens
 an English confirmation dialog; Cancel keeps the cafe and its photos unchanged.
+Wi-Fi and outlets use icons without visible labels: coral when available, grey
+and crossed out when absent or unconfirmed. Good tables is a separate editable
+amenity and filter; the previous laptop-permission option has been removed.
+See [work essentials](docs/WORK_ESSENTIALS.md) for compatibility and setup.
 
 Android system Back closes the current popup or screen before returning to the
 collection. At the home collection it asks before exiting. See

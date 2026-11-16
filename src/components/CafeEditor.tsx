@@ -8,7 +8,7 @@ import OpeningHoursEditor from './OpeningHoursEditor'
 import { openingHoursError } from '../lib/opening-hours'
 
 const districts = ['Mitte','Prenzlauer Berg','Kreuzberg','Friedrichshain','Neukölln','Charlottenburg','Schöneberg','Wedding','Moabit','Tiergarten','Wilmersdorf','Steglitz','Tempelhof','Treptow','Lichtenberg','Pankow','Reinickendorf','Spandau','Köpenick','Marzahn','Hellersdorf','Zehlendorf','Other district']
-const initial: CafeInput = { name: '', district: '', address: '', description: '', lat: 52.52, lng: 13.405, rating: 4, wifi: false, sockets: false, noise: 'moderate', laptop_friendly: true, hours: '', website: '', photos: [] }
+const initial: CafeInput = { name: '', district: '', address: '', description: '', lat: 52.52, lng: 13.405, rating: 4, wifi: false, sockets: false, noise: 'moderate', good_tables: false, hours: '', website: '', photos: [] }
 
 async function compressPhoto(file: File): Promise<File> {
   if (file.size > 20 * 1024 * 1024) throw new Error('This photo is too large. Choose a file up to 20 MB.')
@@ -22,7 +22,7 @@ async function compressPhoto(file: File): Promise<File> {
 }
 
 export default function CafeEditor({ cafe, onClose, onSaved }: { cafe?: Cafe; onClose: () => void; onSaved: (cafe: Cafe) => void }) {
-  const [form, setForm] = useState<CafeInput>(cafe ? { ...cafe } : initial)
+  const [form, setForm] = useState<CafeInput>(cafe ? { ...cafe, good_tables: cafe.good_tables === true } : initial)
   const [files, setFiles] = useState<{ file: File; preview: string }[]>([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -56,8 +56,8 @@ export default function CafeEditor({ cafe, onClose, onSaved }: { cafe?: Cafe; on
     const uploaded: string[] = []
     try {
       for (const { file } of files) uploaded.push(await uploadPhoto(await compressPhoto(file)))
-      const { name, district, address, description, lat, lng, rating, wifi, sockets, noise, laptop_friendly, hours, website } = form
-      const saved = await saveCafe({ name: name.trim(), district: district.trim(), address: address.trim(), description: description.trim(), lat, lng, rating, wifi, sockets, noise, laptop_friendly, hours: hours.trim(), website: website.trim(), photos: [...form.photos, ...uploaded] }, cafe?.id)
+      const { name, district, address, description, lat, lng, rating, wifi, sockets, noise, good_tables, hours, website } = form
+      const saved = await saveCafe({ name: name.trim(), district: district.trim(), address: address.trim(), description: description.trim(), lat, lng, rating, wifi, sockets, noise, good_tables, hours: hours.trim(), website: website.trim(), photos: [...form.photos, ...uploaded] }, cafe?.id)
       files.forEach(f => URL.revokeObjectURL(f.preview)); onSaved(saved)
     } catch (e) {
       await Promise.allSettled(uploaded.map(deletePhoto))
@@ -76,7 +76,7 @@ export default function CafeEditor({ cafe, onClose, onSaved }: { cafe?: Cafe; on
       <div className="field"><label htmlFor="cafe-description">About this place</label><textarea id="cafe-description" rows={4} maxLength={5000} placeholder="What do you like here? Where is the best spot for a laptop?" value={form.description} onChange={e => update('description', e.target.value)} /></div>
       <div className="field"><label>Photos <small>up to 6 photos · JPG, PNG, WebP</small></label><div className="photo-editor">{form.photos.map((p,i) => <div className="photo-thumb" key={p}><img src={p} alt={`Cafe photo ${i+1}`} /><button type="button" aria-label={`Remove photo ${i+1}`} onClick={() => update('photos', form.photos.filter(x => x !== p))}><X size={15} /></button></div>)}{files.map((f,i) => <div className="photo-thumb" key={f.preview}><img src={f.preview} alt={`New photo ${i+1}`} /><button type="button" aria-label={`Remove new photo ${i+1}`} onClick={() => { URL.revokeObjectURL(f.preview); setFiles(fs => fs.filter(x => x !== f)) }}><X size={15} /></button></div>)}{form.photos.length + files.length < 6 && <label className="photo-upload"><ImagePlus size={25} /><span>Add photo</span><input type="file" multiple accept="image/jpeg,image/png,image/webp" aria-label="Upload photos" onChange={e => { const selected = Array.from(e.target.files || []).slice(0, 6-form.photos.length-files.length); setFiles(fs => [...fs, ...selected.map(file => ({ file, preview: URL.createObjectURL(file) }))]); e.target.value = '' }} /></label>}</div></div>
       <div className="rating-editor"><label htmlFor="cafe-rating">Your rating</label><output htmlFor="cafe-rating">★ {form.rating.toFixed(1)}</output><input id="cafe-rating" aria-label="Your rating" type="range" min="1" max="5" step="0.1" value={form.rating} onChange={e => update('rating', Number(e.target.value))} /><div><span>1 — not for me</span><span>5 — a favorite</span></div></div>
-      <div className="field"><label>Work essentials</label><div className="check-grid">{([['wifi','Wi-Fi'],['sockets','Outlets'],['laptop_friendly','Laptops welcome']] as const).map(([key,label]) => <label className="checkbox-option" key={key}><input type="checkbox" checked={form[key]} onChange={e => update(key, e.target.checked)} />{label}</label>)}</div></div>
+      <div className="field"><label>Work essentials</label><div className="check-grid">{([['wifi','Wi-Fi'],['sockets','Outlets'],['good_tables','Good tables']] as const).map(([key,label]) => <label className="checkbox-option" key={key}><input type="checkbox" checked={form[key]} onChange={e => update(key, e.target.checked)} />{label}</label>)}</div></div>
       <div className="field"><label htmlFor="cafe-noise">Noise level</label><select id="cafe-noise" value={form.noise} onChange={e => update('noise', e.target.value as CafeInput['noise'])}><option value="quiet">Quiet — easy to focus</option><option value="moderate">Moderate noise</option><option value="lively">Lively</option></select></div>
       <OpeningHoursEditor value={form.hours} onChange={value => update('hours', value)} onErrorChange={setHoursEditorError} />
       <div className="field"><label htmlFor="cafe-website">Website</label><input id="cafe-website" type="url" maxLength={500} placeholder="https://" value={form.website} onChange={e => update('website', e.target.value)} /></div>

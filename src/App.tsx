@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
-import { ArrowLeft, ArrowUpRight, Check, Coffee, ExternalLink, Grid2X2, Headphones, Laptop, LoaderCircle, Map, MapPin, Maximize2, Navigation, Pencil, Plus, RefreshCw, Search, SlidersHorizontal, Sparkles, Star, Wifi, WifiOff, X, Zap, Clock3 } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Check, Coffee, ExternalLink, Grid2X2, Headphones, Table2, LoaderCircle, Map, MapPin, Maximize2, Navigation, Pencil, Plus, RefreshCw, Search, SlidersHorizontal, Sparkles, Star, Wifi, WifiOff, X, Zap, Clock3 } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import { Capacitor } from '@capacitor/core'
 import { App as NativeApp } from '@capacitor/app'
@@ -14,12 +14,13 @@ import CafeEditor from './components/CafeEditor'
 import CafeSearch from './components/CafeSearch'
 import OpeningHours from './components/OpeningHours'
 import PhotoViewer from './components/PhotoViewer'
+import ConnectionIcon from './components/ConnectionIcon'
 const CafeMap = lazy(() => import('./components/CafeMap'))
 const CACHE_KEY = 'cafe-berlin-catalog-v1'
 function readCache(): Cafe[] | null {
   try {
     const data = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null')
-    return Array.isArray(data) && data.every(c => c && typeof c.id === 'string' && typeof c.name === 'string' && typeof c.district === 'string' && typeof c.address === 'string' && typeof c.description === 'string' && typeof c.created_at === 'string' && typeof c.rating === 'number' && Array.isArray(c.photos)) ? data : null
+    return Array.isArray(data) && data.every(c => c && typeof c.id === 'string' && typeof c.name === 'string' && typeof c.district === 'string' && typeof c.address === 'string' && typeof c.description === 'string' && typeof c.created_at === 'string' && typeof c.rating === 'number' && Array.isArray(c.photos)) ? data.map(c => ({ ...c, good_tables: c.good_tables === true })) : null
   } catch { return null }
 }
 
@@ -36,6 +37,21 @@ function CafeCard({ cafe, onClick }: { cafe: Cafe; onClick: () => void }) {
   </button>
 }
 
+const workFilters = [
+  { key: 'wifi', label: 'Wi-Fi', icon: Wifi, iconOnly: true },
+  { key: 'sockets', label: 'Outlets', icon: Zap, iconOnly: true },
+  { key: 'quiet', label: 'Quiet', icon: Headphones, iconOnly: false },
+  { key: 'good_tables', label: 'Good tables', icon: Table2, iconOnly: false },
+] as const
+
+function WorkFilters({ filters, onToggle, expanded = false }: { filters: Filters; onToggle: (key: typeof workFilters[number]['key']) => void; expanded?: boolean }) {
+  return <div className={expanded ? 'filter-options' : 'quick-filters'}>{workFilters.map(({ key, label, icon: Icon, iconOnly }) =>
+    <button type="button" key={key} className={`${expanded ? '' : 'chip'}${filters[key] ? ' active' : ''}${iconOnly ? ' icon-filter' : ''}`.trim()} aria-label={label} title={label} aria-pressed={filters[key]} onClick={() => onToggle(key)}>
+      <Icon size={iconOnly ? 24 : 17} aria-hidden="true" />{!iconOnly && <span>{label}</span>}
+    </button>
+  )}</div>
+}
+
 function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; demo: boolean; onClose: () => void; onEdit: () => void; onDelete: (button: HTMLButtonElement) => void }) {
   const [photo, setPhoto] = useState(0)
   const [viewerOpen, setViewerOpen] = useState(false)
@@ -48,10 +64,8 @@ function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; de
   }
   const mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${cafe.lat},${cafe.lng}`
   const amenities = [
-    { label: 'Wi-Fi', icon: Wifi, available: cafe.wifi },
-    { label: 'Outlets', icon: Zap, available: cafe.sockets },
     { label: cafe.noise === 'quiet' ? 'Quiet' : 'Atmosphere', icon: Headphones, available: true, detail: cafe.noise === 'quiet' ? '' : noiseLabels[cafe.noise] },
-    { label: 'Laptops welcome', icon: Laptop, available: cafe.laptop_friendly },
+    { label: 'Good tables', icon: Table2, available: cafe.good_tables },
   ]
   return <Modal open onOpenChange={o => !o && onClose()} onEscapeKeyDown={event => {
     // A fast Escape must dismiss the photo viewer before its parent card, even
@@ -70,7 +84,13 @@ function CafeDetails({ cafe, demo, onClose, onEdit, onDelete }: { cafe: Cafe; de
     {cafe.photos.length > 1 && <div className="gallery-thumbs">{cafe.photos.map((url,i) => <button key={`${url}-${i}`} onClick={event => showPhoto(i, event)} aria-label={`Show photo ${i+1}`} aria-pressed={photo === i}><img src={url} alt="" /></button>)}</div>}
     <div className="detail-body">
       {demo && <div className="demo-notice"><Sparkles size={16} /> Sample card. Names and details are illustrative.</div>}
-      <ul className="detail-essentials" aria-label="Work essentials">{amenities.map(({ label, icon: Icon, available, detail }) =>
+      <ul className="detail-essentials" aria-label="Work essentials">
+        {([['wifi', 'Wi-Fi', cafe.wifi], ['sockets', 'Outlets', cafe.sockets]] as const).map(([kind, label, available]) =>
+          <li key={kind} className={`detail-amenity detail-amenity-icon ${available ? 'available' : 'unavailable'}`} aria-label={`${label}: ${available ? 'available' : 'not available / not confirmed'}`} title={`${label}: ${available ? 'available' : 'not available / not confirmed'}`}>
+            <ConnectionIcon kind={kind} available={available} />
+          </li>
+        )}
+        {amenities.map(({ label, icon: Icon, available, detail }) =>
         <li key={label} className={`detail-amenity${available ? '' : ' detail-amenity-unconfirmed'}`}>
           <Icon size={28} aria-hidden="true" /><span>{label}</span>
           {(!available || detail) && <small>{available ? detail : 'No / not confirmed'}</small>}
@@ -137,7 +157,7 @@ export default function App() {
   const source = demo ? demoCafes : cafes
   const visible = useMemo(() => filterCafes(source, query, filters, sort), [source, query, filters, sort])
   const districts = [...new Set(source.map(c => c.district))].sort()
-  const filterCount = Number(filters.wifi)+Number(filters.sockets)+Number(filters.quiet)+Number(Boolean(filters.district))+Number(filters.minRating>1)
+  const filterCount = Number(filters.wifi)+Number(filters.sockets)+Number(filters.quiet)+Number(filters.good_tables)+Number(Boolean(filters.district))+Number(filters.minRating>1)
   useAndroidBackButton()
   useBackHandler(() => {
     if (view === 'map') { setView('list'); window.scrollTo(0, 0) }
@@ -175,7 +195,7 @@ export default function App() {
           </section>}
           <section className="catalog-section filters-section" aria-labelledby="filters-heading">
             <div className="section-heading"><h2 id="filters-heading">Filters</h2></div>
-            <div className="quick-filters">{([['wifi','Wi-Fi',Wifi],['sockets','Outlets',Zap],['quiet','Quiet',Headphones]] as const).map(([key,label,Icon]) => <button key={key} className={filters[key] ? 'chip active' : 'chip'} aria-pressed={filters[key]} onClick={() => setFilters(f => ({ ...f, [key]: !f[key] }))}><Icon size={17} aria-hidden="true" />{label}</button>)}</div>
+            <WorkFilters filters={filters} onToggle={key => setFilters(f => ({ ...f, [key]: !f[key] }))} />
             <div className="filter-actions">{filtersButton}{(query || filterCount > 0) && <button className="section-action" onClick={reset}>Clear all</button>}</div>
           </section>
           {view === 'list' && <section className="catalog-section cafes-section" aria-labelledby="cafes-heading">
@@ -194,7 +214,7 @@ export default function App() {
     <nav className="mobile-nav" aria-label="Mobile navigation"><button className={view==='list' ? 'active' : ''} onClick={() => { setView('list'); window.scrollTo(0, 0) }}><Grid2X2 size={21} /><span>Places</span></button><button className="mobile-add" aria-label="Add cafe" onClick={newCafe} disabled={offline}><Plus size={24} /></button><button className={view==='map' ? 'active' : ''} onClick={() => { setView('map'); window.scrollTo(0, 0) }}><Map size={21} /><span>Map</span></button></nav>
     {selected && !editor && <CafeDetails key={selected.id} cafe={selected} demo={demo} onClose={() => { if (deleting) { if (!busy) setDeleting(null) } else setSelected(null) }} onEdit={() => setEditor(selected)} onDelete={button => { deleteButtonRef.current = button; setDeleting(selected) }} />}
     {editor && <CafeEditor cafe={editor === 'new' ? undefined : editor} onClose={() => setEditor(null)} onSaved={saved => { cache([saved, ...cafes.filter(c => c.id !== saved.id)]); setEditor(null); setSelected(null); setToast('Cafe saved'); setCached(false); setError('') }} />}
-    <Modal open={filterOpen} onOpenChange={setFilterOpen} title="Find your place" description="Choose what matters for a good workday." className="filter-modal"><div className="filter-form"><fieldset className="filter-districts"><legend>District</legend><div role="group" aria-label="District"><button type="button" aria-pressed={!filters.district} onClick={() => setFilters(f => ({ ...f, district: '' }))}>All Berlin districts</button>{districts.map(d => <button type="button" key={d} aria-pressed={filters.district === d} onClick={() => setFilters(f => ({ ...f, district: d }))}>{d}</button>)}</div></fieldset><div className="field"><label htmlFor="filter-rating">Minimum rating: {formatRating(filters.minRating)}</label><input id="filter-rating" type="range" min="1" max="5" step="0.1" value={filters.minRating} onChange={e => setFilters(f => ({ ...f, minRating: Number(e.target.value) }))} /></div><div className="filter-options">{([['wifi','Wi-Fi','Stay connected',Wifi],['sockets','Outlets','Keep your battery topped up',Zap],['quiet','Quiet atmosphere','Find your focus',Headphones]] as const).map(([key,label,hint,Icon]) => <button type="button" key={key} aria-pressed={filters[key]} onClick={() => setFilters(f => ({ ...f, [key]: !f[key] }))}><Icon size={20} aria-hidden="true" /><span>{label}<small>{hint}</small></span></button>)}</div><div className="form-actions"><Button variant="outline" onClick={() => setFilters(emptyFilters)}>Reset</Button><Button onClick={() => setFilterOpen(false)}>Show {visible.length} {placeWord(visible.length)}</Button></div></div></Modal>
+    <Modal open={filterOpen} onOpenChange={setFilterOpen} title="Find your place" description="Choose what matters for a good workday." className="filter-modal"><div className="filter-form"><fieldset className="filter-districts"><legend>District</legend><div role="group" aria-label="District"><button type="button" aria-pressed={!filters.district} onClick={() => setFilters(f => ({ ...f, district: '' }))}>All Berlin districts</button>{districts.map(d => <button type="button" key={d} aria-pressed={filters.district === d} onClick={() => setFilters(f => ({ ...f, district: d }))}>{d}</button>)}</div></fieldset><div className="field"><label htmlFor="filter-rating">Minimum rating: {formatRating(filters.minRating)}</label><input id="filter-rating" type="range" min="1" max="5" step="0.1" value={filters.minRating} onChange={e => setFilters(f => ({ ...f, minRating: Number(e.target.value) }))} /></div><WorkFilters expanded filters={filters} onToggle={key => setFilters(f => ({ ...f, [key]: !f[key] }))} /><div className="form-actions"><Button variant="outline" onClick={() => setFilters(emptyFilters)}>Reset</Button><Button onClick={() => setFilterOpen(false)}>Show {visible.length} {placeWord(visible.length)}</Button></div></div></Modal>
     <Modal open={Boolean(deleting)} onOpenChange={o => !busy && !o && setDeleting(null)} role="alertdialog" className="delete-modal" overlayClassName="delete-overlay" initialFocusRef={cancelDeleteRef} closeDisabled={busy} onCloseAutoFocus={event => {
       event.preventDefault()
       const target = deleteButtonRef.current?.isConnected ? deleteButtonRef.current : document.querySelector<HTMLButtonElement>('.mobile-add')

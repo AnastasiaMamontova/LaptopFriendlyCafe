@@ -36,7 +36,7 @@ async function back(page: Page) { await page.evaluate(() => (window as unknown a
 async function exitCalls(page: Page) { return page.evaluate(() => (window as unknown as AndroidHarness).androidExitCalls) }
 
 async function backend(page: Page) {
-  let cafes = [{ id: '11111111-1111-4111-8111-111111111111', name: 'Back Cafe', district: 'Mitte', address: 'Sample street 1, Berlin', description: 'A place for coffee and work.', rating: 4.7, lat: 52.52, lng: 13.405, wifi: true, sockets: true, noise: 'quiet', laptop_friendly: true, hours: 'Mon–Fri 08:00–17:00', website: '', photos: ['/demo/green-corner.jpg', '/demo/sunday-coffee.jpg'], created_at: '2026-01-01', updated_at: '2026-01-01' }]
+  let cafes = [{ id: '11111111-1111-4111-8111-111111111111', name: 'Back Cafe', district: 'Mitte', address: 'Sample street 1, Berlin', description: 'A place for coffee and work.', rating: 4.7, lat: 52.52, lng: 13.405, wifi: true, sockets: true, noise: 'quiet', good_tables: true, hours: 'Mon–Fri 08:00–17:00', website: '', photos: ['/demo/green-corner.jpg', '/demo/sunday-coffee.jpg'], created_at: '2026-01-01', updated_at: '2026-01-01' }]
   const writes: string[] = []
   await page.route('https://**.supabase.co/**', async route => {
     const request = route.request(), url = new URL(request.url())

@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 // curl honors the inherited Cloud proxy/CA configuration. Keep credentials on
@@ -30,8 +30,10 @@ const tables = request(`${endpoint}/database/query`, token, {
   query: "select tablename from pg_tables where schemaname = 'public' order by tablename",
 })
 console.log(`Connected to Supabase. Public tables: ${tables.map(table => table.tablename).join(', ') || '(none)'}.`)
-const migration = readFileSync(new URL('../supabase/migrations/202611100001_cafes.sql', import.meta.url), 'utf8')
-request(`${endpoint}/database/query`, token, { query: migration })
+const migrations = new URL('../supabase/migrations/', import.meta.url)
+for (const name of readdirSync(migrations).filter(name => name.endsWith('.sql')).sort()) {
+  request(`${endpoint}/database/query`, token, { query: readFileSync(new URL(name, migrations), 'utf8') })
+}
 const keys = request(`${endpoint}/api-keys`, token)
 const anon = keys.find(key => key.name === 'anon')?.api_key
 if (!anon) throw new Error('No public anon API key is available for this project.')

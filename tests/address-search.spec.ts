@@ -42,7 +42,7 @@ async function map(page: Page) {
     if (route.request().method() !== 'GET') { writes++; return route.abort('blockedbyclient') }
     return route.fulfill({ contentType: 'application/json', body: JSON.stringify([{
       id: '11111111-1111-4111-8111-111111111111', name: 'Existing Cafe', district: 'Mitte', address: 'Teststraße 1',
-      lat: 52.52, lng: 13.405, description: '', rating: 4, wifi: true, sockets: true, noise: 'quiet', laptop_friendly: true,
+      lat: 52.52, lng: 13.405, description: '', rating: 4, wifi: true, sockets: true, noise: 'quiet', good_tables: true,
       hours: '', website: '', photos: [], created_at: '2026-01-01', updated_at: '2026-01-01',
     }]) })
   })

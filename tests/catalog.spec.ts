@@ -7,7 +7,7 @@ const image = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAIAAAAC64paAAAACXBIW
 const fixture = (id: string, name: string, district: string, rating: number, extras: Partial<Cafe> = {}): Cafe => ({
   id, name, district, rating, address: 'Teststraße 1, Berlin', lat: 52.52, lng: 13.405,
   description: 'A cozy place to work with a laptop.', wifi: true, sockets: true,
-  noise: 'quiet', laptop_friendly: true, hours: '09:00–18:00', website: 'https://example.com',
+  noise: 'quiet', good_tables: true, hours: '09:00–18:00', website: 'https://example.com',
   photos: [], created_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-01T00:00:00Z', ...extras,
 })
 test.beforeEach(async ({ page }) => {
@@ -80,7 +80,7 @@ async function setRange(page: Page, selector: string, value: string) {
 test('cafe details preserve amenities, complete hours, gallery and editing in the compact layout', async ({ page }) => {
   const photos = ['one', 'two'].map(name => `https://ui-test.supabase.co/storage/v1/object/public/cafe-photos/${name}.jpg`)
   await mockBackend(page, [fixture(initialCafes[0].id, 'Detail Cafe', 'Mitte', 4.7, {
-    wifi: false, laptop_friendly: false, noise: 'lively', photos,
+    wifi: false, good_tables: false, noise: 'lively', photos,
     hours: 'Mon–Fri 09:00–18:00\nSat 10:00–16:00\nSun Closed',
   })])
   await page.goto('/')
@@ -88,7 +88,9 @@ test('cafe details preserve amenities, complete hours, gallery and editing in th
   const dialog = page.getByRole('dialog')
   const amenities = dialog.getByRole('list', { name: 'Work essentials' })
   await expect(amenities.getByRole('listitem')).toHaveCount(4)
-  await expect(amenities.getByText('No / not confirmed', { exact: true })).toHaveCount(2)
+  await expect(amenities.getByText('No / not confirmed', { exact: true })).toHaveCount(1)
+  await expect(amenities.getByRole('listitem', { name: 'Wi-Fi: not available / not confirmed', exact: true })).toHaveText('')
+  await expect(amenities.getByRole('listitem', { name: 'Outlets: available', exact: true })).toHaveText('')
   await expect(amenities).toContainText('Lively')
   await expect(amenities.getByText('Quiet', { exact: true })).toHaveCount(0)
   await expect(dialog.locator('.detail-rating')).toHaveText('4.7· Your rating')
@@ -536,7 +538,7 @@ test('English interface, accessible labels and decimal ratings', async ({ page }
   await expect(page.locator('body')).not.toContainText(/[\u0400-\u04ff]/)
   await page.getByRole('button', { name: 'Filters', exact: true }).click()
   await expect(page.getByRole('dialog').getByRole('checkbox')).toHaveCount(0)
-  await expect(page.getByRole('dialog').locator('.filter-options button')).toHaveCount(3)
+  await expect(page.getByRole('dialog').locator('.filter-options button')).toHaveCount(4)
   await expect(page.getByRole('dialog')).not.toContainText(/[\u0400-\u04ff]/)
   await page.getByRole('button', { name: 'Show 3 places', exact: true }).click()
   await page.getByRole('button', { name: 'Add cafe', exact: true }).click()
@@ -544,4 +546,102 @@ test('English interface, accessible labels and decimal ratings', async ({ page }
   await expect(editor).not.toContainText(/[\u0400-\u04ff]/)
   await expect(editor.getByLabel('Your rating', { exact: true })).toHaveValue('4')
   await expect(editor.locator('output')).toContainText('4.0')
+})
+
+test('Good tables combines with other filters, suggestions, map results and reset', async ({ page }) => {
+  const backend = await mockBackend(page, [
+    fixture(initialCafes[0].id, 'Comfort Coffee', 'Mitte', 4.6, { good_tables: true }),
+    fixture(initialCafes[1].id, 'Table Coffee', 'Kreuzberg', 4.8, { good_tables: true, wifi: false }),
+    Object.assign(fixture(initialCafes[2].id, 'Legacy Coffee', 'Mitte', 4.9, { good_tables: false }), { laptop_friendly: true }),
+  ])
+  await open(page)
+  const wifi = page.getByRole('button', { name: 'Wi-Fi', exact: true })
+  const outlets = page.getByRole('button', { name: 'Outlets', exact: true })
+  await expect(wifi).toHaveText('')
+  await expect(outlets).toHaveText('')
+  await expect(wifi).toHaveAttribute('aria-pressed', 'false')
+  await page.getByRole('button', { name: 'Good tables', exact: true }).click()
+  await expect(page.locator('.cafe-card')).toHaveCount(2)
+  await expect(page.locator('.filters-button b')).toHaveText('1')
+  await wifi.click()
+  await expect(page.locator('.cafe-card')).toHaveCount(1)
+  await expect(page.locator('.card-title h3')).toHaveText(['Comfort Coffee'])
+  await expect(page.locator('.filters-button b')).toHaveText('2')
+  const input = page.getByRole('combobox', { name: 'Search cafes', exact: true })
+  await input.fill('c')
+  await expect(page.getByRole('listbox', { name: 'Cafe suggestions' }).getByRole('option')).toHaveCount(1)
+  await page.getByRole('button', { name: 'Open map', exact: true }).click()
+  await expect(page.locator('.cafe-marker')).toHaveCount(1)
+  await page.getByRole('button', { name: 'Filters', exact: true }).click()
+  const filter = page.getByRole('dialog', { name: 'Find your place', exact: true })
+  await expect(filter.getByRole('button', { name: 'Good tables', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await filter.getByRole('button', { name: 'Reset', exact: true }).click()
+  await filter.getByRole('button', { name: 'Show 3 places', exact: true }).click()
+  await page.getByRole('button', { name: 'Clear all', exact: true }).click()
+  await expect(page.locator('.cafe-marker')).toHaveCount(3)
+  expect(backend.writes).toHaveLength(0)
+})
+
+test('Wi-Fi and outlets use lit or crossed grey icons without visible labels', async ({ page }) => {
+  await mockBackend(page, [
+    fixture(initialCafes[0].id, 'Connected Cafe', 'Mitte', 4.6),
+    fixture(initialCafes[1].id, 'Unplugged Cafe', 'Mitte', 4.5, { wifi: false, sockets: false, good_tables: false }),
+  ])
+  await page.goto('/')
+  for (const [name, available] of [['Connected Cafe', true], ['Unplugged Cafe', false]] as const) {
+    await page.getByRole('button', { name: `Open ${name}`, exact: true }).click()
+    const detail = page.getByRole('dialog', { name, exact: true })
+    const essentials = detail.getByRole('list', { name: 'Work essentials' })
+    for (const [label, icon] of [['Wi-Fi', 'wifi'], ['Outlets', 'zap']]) {
+      const item = essentials.getByRole('listitem', { name: `${label}: ${available ? 'available' : 'not available / not confirmed'}`, exact: true })
+      await expect(item).toHaveText('')
+      await expect(item.locator(`.lucide-${icon}${available ? '' : '-off'}`)).toHaveCount(1)
+      await expect(item).toHaveCSS('color', available ? 'rgb(181, 54, 62)' : 'rgb(139, 133, 143)')
+    }
+    await expect(essentials).toContainText('Good tables')
+    await expect(detail).not.toContainText(/Laptop friendly|Laptops welcome/)
+    await detail.getByRole('button', { name: 'Close', exact: true }).click()
+  }
+})
+
+test('Good tables is saved independently, survives reload and can be removed', async ({ page }) => {
+  const backend = await mockBackend(page)
+  await open(page)
+  await page.getByRole('button', { name: 'Open Alpha Coffee', exact: true }).click()
+  await page.getByRole('button', { name: 'Edit cafe', exact: true }).click()
+  await expect(page.getByRole('checkbox', { name: /Laptop/ })).toHaveCount(0)
+  await page.getByRole('checkbox', { name: 'Good tables', exact: true }).uncheck()
+  await page.getByRole('button', { name: 'Save changes', exact: true }).click()
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  expect(backend.writes[0].body.good_tables).toBe(false)
+  expect(backend.writes[0].body).not.toHaveProperty('laptop_friendly')
+  await page.reload()
+  await page.getByRole('button', { name: 'Open Alpha Coffee', exact: true }).click()
+  await page.getByRole('button', { name: 'Edit cafe', exact: true }).click()
+  await expect(page.getByRole('checkbox', { name: 'Good tables', exact: true })).not.toBeChecked()
+  await page.getByRole('checkbox', { name: 'Good tables', exact: true }).check()
+  await page.getByRole('button', { name: 'Save changes', exact: true }).click()
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  expect(backend.writes[1].body.good_tables).toBe(true)
+  expect(backend.writes[1].body.wifi).toBe(true)
+  expect(backend.writes[1].body.sockets).toBe(true)
+  await page.getByRole('button', { name: 'Add cafe', exact: true }).click()
+  await expect(page.getByRole('checkbox', { name: 'Good tables', exact: true })).not.toBeChecked()
+})
+
+test('older offline cafes keep their details without assuming they have Good tables', async ({ page }) => {
+  const oldCafe = { ...initialCafes[0], laptop_friendly: true } as Partial<Cafe>
+  delete oldCafe.good_tables
+  await page.addInitScript(cafe => localStorage.setItem('cafe-berlin-catalog-v1', JSON.stringify([cafe])), oldCafe)
+  await page.route('https://**.supabase.co/**', route => route.abort())
+  await page.goto('/')
+  await expect(page.locator('.cafe-card')).toHaveCount(1)
+  await page.getByRole('button', { name: 'Open Alpha Coffee', exact: true }).click()
+  await expect(page.locator('.detail-description')).toHaveText(oldCafe.description!)
+  await expect(page.getByRole('listitem', { name: 'Wi-Fi: available', exact: true })).toHaveText('')
+  await page.getByRole('button', { name: 'Close', exact: true }).click()
+  await page.getByRole('button', { name: 'Good tables', exact: true }).click()
+  await expect(page.getByText('No matches just yet', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Reset filters', exact: true }).click()
+  await expect(page.locator('.cafe-card')).toHaveCount(1)
 })

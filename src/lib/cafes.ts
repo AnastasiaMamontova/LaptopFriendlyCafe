@@ -13,7 +13,8 @@ function client() {
 export async function listCafes(): Promise<Cafe[]> {
   const { data, error } = await client().from('cafes').select('*').order('created_at', { ascending: false })
   if (error) throw new Error('Could not load cafes. Check your internet connection.')
-  return (data ?? []) as Cafe[]
+  // Older offline collections predate the separate table-quality field.
+  return (data ?? []).map(cafe => ({ ...cafe, good_tables: cafe.good_tables === true })) as Cafe[]
 }
 
 function validate(input: CafeInput): CafeInput {

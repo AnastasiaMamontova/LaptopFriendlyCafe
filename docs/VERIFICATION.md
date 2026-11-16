@@ -1,4 +1,19 @@
-# Android system Back verification
+# Work essentials verification
+
+Removed Laptop friendly/Laptops welcome from filters, cafe details and editing.
+Added an independent Good tables field and filter. Wi-Fi and outlets use
+label-free icons, with lit coral or crossed grey availability states in details.
+Filters retain accessible names and selection states.
+
+All 92 mobile/desktop tests and the TypeScript/production web/PWA build pass,
+including combined filters, suggestions, map results, save/reload and older
+offline records. Production UI was checked at 320, 390 and 1440 px.
+The additive database migration was applied and checked against a fingerprint
+of existing cafe data; records and photo URLs are unchanged. A public read-only
+Data API check passes. See [work essentials](WORK_ESSENTIALS.md) for screenshots
+and compatibility details. The Android APK has not been rebuilt.
+
+## Android system Back verification
 
 Added internal navigation for the Android system Back button/gesture via the
 official App plugin: photos, dialogs, editor and map return within the app;
