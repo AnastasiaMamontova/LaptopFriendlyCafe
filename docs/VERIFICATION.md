@@ -1,4 +1,18 @@
-# Full-screen photo viewer verification
+# Home-page sections and search verification
+
+Implemented the approved four-section design with compact rows, a lavender
+toggle-filter panel and map preview. The visible app heading and filter
+checkmarks are removed. Local cafe suggestions appear immediately while typing
+and support pointer, keyboard and offline use. More filters uses buttons for
+districts and amenities, and keeps the rating slider.
+
+All 72 mobile/desktop tests and the production web/PWA build pass. The final
+catalog layout also passed its 30-test suite. Production rendering was checked
+at widths of 320, 390 and 1440 px without overflow or runtime errors. See
+[layout details and screenshots](HOME_LAYOUT.md). Tests use mocked backend
+requests; production records are unchanged. No APK was built for this redesign.
+
+## Full-screen photo viewer verification
 
 - Tapping the main cafe photo or a thumbnail opens the selected photo in a
   full-viewport dialog. Images fit inside the screen without cropping.

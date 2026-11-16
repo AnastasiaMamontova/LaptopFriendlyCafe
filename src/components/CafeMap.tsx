@@ -9,6 +9,7 @@ interface CafeMapProps {
   cafes: Cafe[]
   onSelect: (cafe: Cafe) => void
   selectedId?: string
+  compact?: boolean
 }
 
 const BERLIN: [number, number] = [52.52, 13.405]
@@ -48,12 +49,13 @@ function MapViewport({ cafes, selectedId, address }: Pick<CafeMapProps, 'cafes' 
   return null
 }
 
-export default function CafeMap({ cafes, onSelect, selectedId }: CafeMapProps) {
+export default function CafeMap({ cafes, onSelect, selectedId, compact = false }: CafeMapProps) {
   const element = useRef<HTMLDivElement>(null)
   const [tileError, setTileError] = useState(false)
   const [tileAttempt, setTileAttempt] = useState(0)
   const [address, setAddress] = useState<BerlinAddress | null>(null)
   useLayoutEffect(() => {
+    if (compact) return
     const frame = element.current?.closest<HTMLElement>('.map-container')
     if (!frame) return
     let disposed = false
@@ -80,23 +82,24 @@ export default function CafeMap({ cafes, onSelect, selectedId }: CafeMapProps) {
       disposed = true; observer.disconnect(); cancelAnimationFrame(animation)
       window.removeEventListener('resize', schedule)
     }
-  }, [])
+  }, [compact])
   const validCafes = useMemo(() => cafes.filter(cafe =>
     Number.isFinite(cafe.lat) && Number.isFinite(cafe.lng) &&
     Math.abs(cafe.lat) <= 90 && Math.abs(cafe.lng) <= 180,
   ), [cafes])
 
   return <div ref={element} className="cafe-map" role="region" aria-label="Map of Berlin cafes">
-    <AddressSearch onSelect={setAddress} onClear={() => setAddress(null)} />
+    {!compact && <AddressSearch onSelect={setAddress} onClear={() => setAddress(null)} />}
     <div className="map-canvas">
     <MapContainer center={BERLIN} zoom={12} scrollWheelZoom={false} zoomControl={false}
+      dragging={!compact} touchZoom={!compact} doubleClickZoom={!compact} keyboard={!compact} boxZoom={!compact}
       style={{ height: '100%', width: '100%', zIndex: 0 }}>
       <TileLayer key={tileAttempt}
         attribution={'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         maxZoom={19}
         eventHandlers={{ tileerror: () => setTileError(true) }} />
-      <ZoomControl position="bottomright" />
+      {!compact && <ZoomControl position="bottomright" />}
       <MapViewport cafes={validCafes} selectedId={selectedId} address={address} />
       {address && <Marker position={[address.lat, address.lng]} title={address.label} alt={`Address: ${address.label}`} icon={divIcon({ className: 'address-location-marker', html: '<span aria-hidden="true">⌖</span>', iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -32] })}><Popup><strong>{address.label}</strong><br />{address.context}</Popup></Marker>}
       {validCafes.map(cafe => {

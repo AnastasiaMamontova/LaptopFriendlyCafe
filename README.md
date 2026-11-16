@@ -5,6 +5,12 @@ search by name, district or address, filters for Wi-Fi, outlets, quiet spaces,
 district and rating, photos, and personal ratings from 1 to 5 in 0.1
 increments. Add and edit cafes directly from your phone.
 
+The home page separates Search, Filters, Cafes and Map into compact sections.
+Typing a name, district or address immediately suggests matching cafes from the
+current collection, including offline. Choose a suggestion to open its details.
+Filters use toggle buttons, and the map preview opens a larger map with Berlin
+address search. See [home-page layout](docs/HOME_LAYOUT.md).
+
 Tap the main photo or a thumbnail in a cafe's details to view it full screen.
 Browse with swipes, on-screen arrows or the keyboard arrow keys. Close the viewer
 with the close button or Escape to return to the same cafe and selected photo.

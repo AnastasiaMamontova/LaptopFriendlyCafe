@@ -40,6 +40,7 @@ test('rejects equal times, overlapping shifts, and overlap across the week bound
 })
 
 async function backend(page: Page, hours = '') {
+  await page.route('https://tile.openstreetmap.org/**', route => route.abort('blockedbyclient'))
   let cafes: Cafe[] = [{
     id: '11111111-1111-4111-8111-111111111111', name: 'Schedule Cafe', district: 'Mitte',
     address: 'Teststraße 1', description: 'Test cafe', hours, lat: 52.52, lng: 13.405,
