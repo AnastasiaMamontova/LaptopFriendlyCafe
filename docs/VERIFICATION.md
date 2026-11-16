@@ -1,4 +1,14 @@
-# Compact cafe details and delete confirmation
+# Android 1.0.6 verification
+
+The current APK includes all UI changes: home sections and search suggestions,
+full-screen photos, compact cafe details without the cat emblem, weekday hours
+and explicit English delete confirmation. Production web build, Android build,
+Android lint, APK integrity and signature verification pass. All 23 production
+web files match the packaged assets. The signature matches Android 1.0.5.
+See [release verification](ANDROID_RELEASE_1.0.6.md) for details and the checksum.
+The APK is excluded from Git. Physical-device testing was not performed.
+
+## Compact cafe details and delete confirmation
 
 Implemented the approved compact reference: shorter photo, overlapping thumbnails,
 district/rating on one line and plain icon/text amenities without large tiles or
@@ -15,7 +25,7 @@ All 76 mobile/desktop tests and the production web/PWA build pass. Production
 screens were checked at 320, 390 and 1440 px without horizontal overflow or
 runtime errors. See [details and screenshots](CAFE_DETAILS.md). Tests use mocked
 backend requests and screenshots use illustrative data; production records are
-unchanged. No APK was built.
+unchanged. These changes are now included in Android 1.0.6.
 
 ## Home-page sections and search verification
 

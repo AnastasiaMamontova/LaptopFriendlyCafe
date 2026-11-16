@@ -48,4 +48,4 @@ production records:
 - [Desktop details](screenshots/compact-details-desktop.png)
 - [Delete confirmation](screenshots/delete-confirmation-mobile.png)
 
-No APK was built for these changes.
+These changes are included in [Android 1.0.6](ANDROID_RELEASE_1.0.6.md).

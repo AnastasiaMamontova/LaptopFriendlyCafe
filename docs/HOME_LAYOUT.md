@@ -49,5 +49,5 @@ between pointer-down and pointer-up. Keyboard focus leaving the search closes it
   [complete mobile page](screenshots/home-zones-mobile.png),
   [mobile search suggestions](screenshots/home-search-mobile.png),
   [desktop page](screenshots/home-zones-desktop.png).
-- No APK was built. Existing APKs remain unchanged and do not yet include this
-  redesign or the preceding full-screen photo viewer.
+- No APK was built during the initial UI change. This redesign and the photo
+  viewer are now included in [Android 1.0.6](ANDROID_RELEASE_1.0.6.md).
