@@ -1,116 +1,181 @@
+<img src="public/icons/cappuccino-cat-192.png" width="80" height="80" alt="Cafe Berlin cappuccino-cat app icon">
+
 # Cafe Berlin
 
-A mobile-first collection of laptop-friendly cafes in Berlin: list and map views,
-search by name, district or address, filters for Wi-Fi, outlets, quiet spaces, good tables,
-district and rating, photos, and personal ratings from 1 to 5 in 0.1
-increments. Add and edit cafes directly from your phone.
+Find a cafe in Berlin where you can settle in with your laptop. Browse your
+collection, check the work essentials, explore the map, and save a new favorite
+directly from your phone.
 
-The home page separates Search, Filters, Cafes and Map into compact sections.
-Typing a name, district or address immediately suggests matching cafes from the
-current collection, including offline. Choose a suggestion to open its details.
-Filters use toggle buttons, and the map preview opens a larger map with Berlin
-address search. See [home-page layout](docs/HOME_LAYOUT.md).
+Built for mobile, with an English interface, an installable web app, and an
+Android app powered by the same codebase.
 
-Tap the main photo or a thumbnail in a cafe's details to view it full screen.
-Browse with swipes, on-screen arrows or the keyboard arrow keys. Close the viewer
-with the close button or Escape to return to the same cafe and selected photo.
-Cafe details use compact information rows for amenities. Deleting a cafe opens
-an English confirmation dialog; Cancel keeps the cafe and its photos unchanged.
-Wi-Fi and outlets use icons without visible labels: coral when available, grey
-and crossed out when absent or unconfirmed. Good tables is a separate editable
-amenity and filter; the previous laptop-permission option has been removed.
-See [work essentials](docs/WORK_ESSENTIALS.md) for compatibility and setup.
+## Screenshots
 
-Android system Back closes the current popup or screen before returning to the
-collection. At the home collection it asks before exiting. See
-[Android navigation](docs/ANDROID_NAVIGATION.md) for the behavior and validation.
+| Search and filters | Cafe details | Full-screen photos |
+| :---: | :---: | :---: |
+| <img src="docs/screenshots/readme-collection.png" width="250" alt="Mobile collection with search suggestions, Wi-Fi and outlets icons, Quiet and Good tables filters"> | <img src="docs/screenshots/readme-cafe-details.png" width="250" alt="Cafe details with a photo gallery, rating, work essentials, address and weekday opening hours"> | <img src="docs/screenshots/readme-photo-viewer.png" width="250" alt="Full-screen cafe photo viewer with a photo counter and previous and next controls"> |
 
-The app has no sign-in or roles. Browsing, adding, editing and deleting are open
-to everyone, as agreed for this version. The entire interface is in English.
+Screenshots show the current app with illustrative cafe data and sample photos.
+These examples are not added to the live database.
 
-## Local development
+## Features
 
-Requires Node.js 22+ and npm.
+- **Search and filter:** search by cafe name, district, or address, with suggestions
+  as you type. Filter by Wi-Fi, outlets, quiet atmosphere, good tables, district,
+  and minimum rating. Sort by rating, name, or date added.
+- **Explore Berlin:** browse cafe markers, search Berlin addresses with dropdown
+  suggestions, and open directions in Google Maps.
+- **Save useful details:** descriptions, addresses, websites, photos, and opening
+  hours. Set one weekday time range using hour and minute selectors.
+- **Manage your collection:** add, edit, and delete cafes from your phone. Upload
+  up to six photos and rate each place from 1 to 5 in steps of 0.1. Deleting a
+  cafe requires a separate confirmation.
+- **Browse photos:** tap a photo to open it full screen, then swipe or use the
+  arrows to browse.
+- **Use offline:** the PWA keeps the app shell and last loaded collection.
+  Previously viewed photos may also be cached. Editing, uploads, address search,
+  and loading map tiles require an internet connection.
 
-```sh
-npm ci
-# Copy .env.example to .env.local and enter the public Supabase settings,
-# or run npm run setup:backend with the configured environment variables.
-npm run dev
-```
+Wi-Fi and outlets appear as icons without visible labels in cafe details:
+coral when available, grey and crossed out when absent or unconfirmed. Good
+tables is a separate editable amenity and filter.
 
-Open http://localhost:5173. `npm run build` produces `dist/`;
-`npm run preview` serves the production build locally.
+There is no sign-in, account system, or role management. Anyone using the app
+can read, add, edit, and delete cafes and photos. There are no user reviews or
+comments. Demo cards are available separately and never written to the database.
 
-Cafe records are stored in Supabase PostgreSQL and photos in Supabase Storage.
-See [supabase/README.md](supabase/README.md) for setup and field descriptions.
-Choose one opening and closing time for Monday–Friday from the weekday editor;
-see [opening-hours instructions](docs/OPENING_HOURS.md) for overnight hours and
-compatibility with existing records.
-The map also provides [Berlin address suggestions](docs/ADDRESS_SEARCH.md)
-through Photon, without API keys or billing.
-The Supabase management token stays in the development environment. Only the
-project URL and public anon key are included in browser and APK builds.
+## Tech stack
 
-## Android and APK
+| Layer | Technology |
+| --- | --- |
+| Interface | React, TypeScript, Vite |
+| Styling and components | Tailwind CSS, shadcn/ui, Radix UI, Lucide icons |
+| Maps | Leaflet, React Leaflet, OpenStreetMap |
+| Address suggestions | Photon for Berlin addresses |
+| Data and photos | Supabase PostgreSQL, Storage, Data API |
+| Offline web app | vite-plugin-pwa |
+| Android | Capacitor |
+| Hosting configuration | Cloudflare Pages |
 
-The app uses the cappuccino-cat icon. See [branding assets](docs/BRANDING.md)
-to regenerate browser, PWA and Android artwork without building an APK.
+Maps and address search use OpenStreetMap-based services without Google Cloud
+billing or a Google Maps API key. Directions open an external Google Maps link.
+For heavier address-search usage, the Photon endpoint can be configured.
 
-Build the test APK locally using [scripts/android-README.md](scripts/android-README.md).
-Generated APKs are excluded from Git. Open your local APK on Android and allow
-installation from your browser or file manager.
-Google Play is not required. The APK bundles the web app and connects to the
-configured Supabase project directly, so it works without a deployed website.
-Requires Android 6.0+ and a modern Android System WebView.
+## Run locally
 
-Build instructions: [scripts/android-README.md](scripts/android-README.md).
-This is a development-signed test build. Keep the signing key outside the
-repository to install future builds as updates over this installation.
+Requires **Node.js 22 or newer** and **npm**.
 
-Once hosted over HTTPS, the web app can also be installed as a PWA from Chrome's
-“Add to Home screen” menu. The app shell and last loaded collection are available
-offline. Editing, new photos and map tiles require an internet connection.
-Previously viewed cafe photos can be available offline in the PWA.
+1. Clone the repository and install dependencies:
 
-The live collection starts empty. “Explore a sample collection” opens clearly
-marked demo cards with illustrative names, addresses and ratings. They are never
-written to the database. Illustrative photos from Unsplash:
-[1](https://images.unsplash.com/photo-1442512595331-e89e73853f31),
-[2](https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb),
-[3](https://images.unsplash.com/photo-1554118811-1e0d58224f24).
+   ```sh
+   git clone https://github.com/AnastasiaMamontova/LaptopFriendlyCafe.git
+   cd LaptopFriendlyCafe
+   npm ci
+   ```
 
-## Cloudflare Pages
+2. Configure a Supabase project using the [backend instructions](supabase/README.md).
+   Apply the SQL migrations in filename order, including the Good tables
+   migration. For an existing configured project, use its public connection
+   settings.
 
-The project is ready for hosting. Automatic deployment is not configured.
+3. Copy `.env.example` to `.env.local`:
 
-- Framework: Vite; build command: `npm run build`; output directory: `dist`.
-- Node.js: `22` or later.
-- Build variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
-- The frontend does not need `SUPABASE_ACCESS_TOKEN` or a service-role key.
-- Changing build variables requires rebuilding the PWA and APK.
+   ```sh
+   cp .env.example .env.local
+   ```
 
-## Verification
+   Set these values in `.env.local`:
 
-```sh
-npm test
-npm run build
-```
+   ```dotenv
+   VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+   VITE_SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_KEY
+   ```
 
-Playwright checks mobile and desktop layouts, search, combined filters, sorting,
-the map, cafe details, CRUD with photos, manual coordinates and offline caching.
-It detects `/usr/bin/chromium` when available; set
-`PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to use another installation. These tests
-mock the API and do not change the live database.
+4. Start the app:
 
-To check the **real** Supabase connection, keep `npm run dev` running and execute
-`node scripts/live-smoke.mjs`. It creates and deletes a temporary cafe and photo.
-In a managed environment, Chromium must trust the environment's proxy certificate.
-To check the production PWA, run the preview server on port 4173 and execute
-`node scripts/pwa-smoke.mjs`.
+   ```sh
+   npm run dev
+   ```
 
-Verification details: [docs/VERIFICATION.md](docs/VERIFICATION.md).
-Repository migration: [docs/MIGRATION.md](docs/MIGRATION.md).
+   Open **http://localhost:5173**.
 
-Stack: React, TypeScript, Vite, Tailwind CSS, shadcn/ui components using Radix,
-Leaflet / React Leaflet / OpenStreetMap, Supabase, vite-plugin-pwa and Capacitor.
+The project URL and public anon key are included in browser and Android builds.
+Keep the Supabase management token and any service-role key outside client
+configuration and Git. `.env.local` is ignored by Git.
+
+For automated backend setup, supply `SUPABASE_PROJECT_ID` and
+`SUPABASE_ACCESS_TOKEN` through the environment and run `npm run setup:backend`.
+The script applies migrations and writes only public client settings to
+`.env.local`. See the [backend guide](supabase/README.md) for access policies and
+existing-database compatibility.
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the local development server |
+| `npm test` | Run Playwright checks for mobile and desktop |
+| `npm run build` | Check TypeScript and create the production web/PWA build in `dist/` |
+| `npm run preview` | Preview the production build locally |
+| `npm run android:sync` | Build the web app and sync it to the Android project |
+| `npm run android:build` | Build a development-signed Android APK |
+| `npm run icons:generate` | Generate browser, PWA, and Android icons |
+
+Playwright tests intercept backend requests and do not modify the live database.
+They cover search, combined filters, maps, cafe editing, photos, offline data,
+confirmation dialogs, and Android Back behavior through a simulated bridge.
+The test configuration detects `/usr/bin/chromium` when available; otherwise
+install Playwright Chromium or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`.
+See [verification details](docs/VERIFICATION.md) for the checks performed and
+their limits.
+
+## Android and PWA
+
+The Android app bundles the web interface and connects directly to Supabase;
+a deployed website is not required. It supports Android 6.0 or newer with a
+modern Android System WebView. System Back closes the current photo or dialog,
+returns through the app, and asks before exiting from the home collection.
+
+Building requires JDK 21 and the Android SDK in addition to Node.js. Follow the
+[Android build guide](scripts/android-README.md). The APK is written to
+`downloads/cafe-berlin-debug.apk`; generated APKs and signing keys are excluded
+from Git. Keep the signing key to install future builds as updates.
+
+The last verified APK is **1.0.6**. The newer Good tables and Android Back changes
+are in the source code and require a new APK build to reach installed devices.
+
+When hosted over HTTPS, the web app can also be installed from the browser's
+**Add to Home screen** menu. There is no in-app install button or install prompt.
+
+## Web deployment
+
+Cloudflare Pages configuration is prepared; automatic deployment is not configured.
+
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
+- **Node.js:** 22 or newer
+- **Environment variables:** `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+
+Client environment values are embedded at build time. Rebuild the web app or APK
+after changing them. The frontend does not need a Supabase management token or
+service-role key.
+
+## Documentation
+
+| Guide | Contents |
+| --- | --- |
+| [Backend setup](supabase/README.md) | Database, Storage, migrations, and public access policies |
+| [Home layout](docs/HOME_LAYOUT.md) | Search, filters, cafe list, and map sections |
+| [Work essentials](docs/WORK_ESSENTIALS.md) | Good tables, availability icons, and data compatibility |
+| [Opening hours](docs/OPENING_HOURS.md) | Weekday time selectors and existing schedules |
+| [Berlin address search](docs/ADDRESS_SEARCH.md) | Address suggestions and provider configuration |
+| [Cafe details](docs/CAFE_DETAILS.md) | Compact details and deletion confirmation |
+| [Android navigation](docs/ANDROID_NAVIGATION.md) | System Back handling and exit confirmation |
+| [Android builds](scripts/android-README.md) | Build tools, signing, and installation |
+| [Branding](docs/BRANDING.md) | Cappuccino-cat icon assets |
+| [Verification](docs/VERIFICATION.md) | Test results and build checks |
+
+Sample photos are from Unsplash:
+[coffee](https://images.unsplash.com/photo-1442512595331-e89e73853f31),
+[cafe](https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb),
+[interior](https://images.unsplash.com/photo-1554118811-1e0d58224f24).
