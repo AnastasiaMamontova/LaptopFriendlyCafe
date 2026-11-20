@@ -13,10 +13,10 @@ Android app powered by the same codebase.
 
 | Search and filters | Cafe details | Full-screen photos |
 | :---: | :---: | :---: |
-| <img src="docs/screenshots/readme-collection.png" width="250" alt="Mobile collection with search suggestions, Wi-Fi and outlets icons, Quiet and Good tables filters"> | <img src="docs/screenshots/readme-cafe-details.png" width="250" alt="Cafe details with a photo gallery, rating, work essentials, address and weekday opening hours"> | <img src="docs/screenshots/readme-photo-viewer.png" width="250" alt="Full-screen cafe photo viewer with a photo counter and previous and next controls"> |
+| <img src="docs/screenshots/app-collection.png" width="250" alt="Cafe search with a Coffee Circle result, work filters and the Berlin map"> | <img src="docs/screenshots/app-cafe-details.png" width="250" alt="Coffee Circle details with uploaded photos, a rating, work essentials, address and saved opening hours"> | <img src="docs/screenshots/app-photo-viewer.png" width="250" alt="Full-screen Coffee Circle photo viewer showing uploaded photo 2 of 3"> |
 
-Screenshots show the current app with illustrative cafe data and sample photos.
-These examples are not added to the live database.
+Screenshots captured from the running mobile web app using the real cafe
+collection and uploaded photos. Shown here: Coffee Circle in Wedding.
 
 ## Features
 
@@ -175,7 +175,7 @@ service-role key.
 | [Branding](docs/BRANDING.md) | Cappuccino-cat icon assets |
 | [Verification](docs/VERIFICATION.md) | Test results and build checks |
 
-Sample photos are from Unsplash:
+Built-in demo photos are from Unsplash:
 [coffee](https://images.unsplash.com/photo-1442512595331-e89e73853f31),
 [cafe](https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb),
 [interior](https://images.unsplash.com/photo-1554118811-1e0d58224f24).
